@@ -1,8 +1,9 @@
+import { banUserBody } from "../types/streamType";
 import { userType } from "../types/user";
 
 export class userManager{
-  private allUsers:Array<userType>;
-  private bannedUser:Array<userType>;
+  public allUsers:Array<userType>;
+  public bannedUser:Array<string>;
   private static instance:userManager;
   private constructor(){
     this.allUsers = [];
@@ -17,15 +18,17 @@ export class userManager{
     }
   }
   public addUser(userDetails:userType){
+    if(!this.allUsers.find(e=>e.userId === userDetails.userId))
+    {
     this.allUsers.push(userDetails);
+    console.log("new user added");
+    }
   }
-  public banUser(userDetails:userType){
-    this.bannedUser.push(userDetails);
+  public banUser(userDetails:banUserBody){
+    if(!this.bannedUser.find(e=> e===userDetails.userId))
+    this.bannedUser.push(userDetails.userId);
   }
   public isBanned(id:string):boolean{
-    return this.bannedUser.find(e=>e.userId===id) ? true:false;
-  }
-  public getUser(id:string):userType|undefined{
-    return this.allUsers.find(e => e.userId === id);
+    return this.bannedUser.find(e=> e===id) ? true:false;
   }
 }

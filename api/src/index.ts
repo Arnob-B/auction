@@ -10,11 +10,11 @@ app.use(express.json());
 app.use("/admin",adminRoute);
 
 app.post('/bid',async(req,res)=>{
-  const {type,playerId, bidderId, amnt}= req.body;
-  if(type !== undefined && playerId !==undefined && bidderId !== undefined && amnt !== undefined)
+  const {playerId, bidderId, amnt}= req.body;
+  if(playerId !==undefined && bidderId !== undefined && amnt !== undefined)
   {
     const response = await redisManager.getInstance().publish({
-      type:type,
+      type:placeBid,
       body: {
         playerId: playerId,
         bidderId: bidderId,
