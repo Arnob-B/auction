@@ -6,7 +6,7 @@ export type addPlayerBody = {
 }
 export const addUser = "ADD_USER";
 export type addUserBody = {
-  userId:string,
+  userId:string
 }
 export const banUser = "BAN_USER";
 export type banUserBody = {
@@ -18,6 +18,9 @@ export type placeBidBody = {
   bidderId: string,
   bidAmnt: number
 }
+
+
+export const sellPlayer = "SELL_PLAYER";
 export type messagesFromApiType = {
   type : typeof addPlayer,
   body : addPlayerBody
@@ -31,4 +34,7 @@ export type messagesFromApiType = {
 }| {
   type: typeof placeBid,
   body: placeBidBody
+}|{
+  type:typeof sellPlayer,
+  body?:string
 };
