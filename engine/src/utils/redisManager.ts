@@ -1,5 +1,5 @@
 import { RedisClientType, createClient } from "redis";
-import { inputType } from "./types/in";
+import { inputType } from "../types/in";
 export default class redisManager{
   private client:RedisClientType;
   private publisher:RedisClientType;

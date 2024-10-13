@@ -1,4 +1,4 @@
-import { playerStat } from "./types/playerStats";
+import { playerStat } from "../types/playerStats";
 
 //singleton
 export default class player{
@@ -6,6 +6,7 @@ export default class player{
   private name:string;
   private basePrice:number;
   private currentPrice:number;
+  private incrementPrice:number;
   private currentWinningBidder:string;
   private static instance:player;
   private constructor(){
@@ -14,6 +15,7 @@ export default class player{
     this.currentWinningBidder="";
     this.basePrice = 0;
     this.currentPrice = 0;
+    this.incrementPrice = 0;
   }
   public static getInstance(){
     if(this.instance){

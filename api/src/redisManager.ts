@@ -25,7 +25,7 @@ export default class redisManager{
        return this.instance;
     }
   }
-  public async publish({playerId,bidderId, amnt}:{
+  public async publishBid({playerId,bidderId, amnt}:{
     playerId:string,
     bidderId:string,
     amnt:number
@@ -35,6 +35,24 @@ export default class redisManager{
         playerId: playerId,
         bidderId: bidderId,
         amnt: amnt
+      }));
+      return "success";
+    }
+    catch (err) {
+      console.log(err);
+      return "failed";
+    }
+  }
+  public async publishPlayer({playerId,playerName, basePrice}:{
+    playerId:string,
+    playerName:string,
+    basePrice:number,
+  }):Promise<string>{
+    try {
+      await this.publisher.lPush("bid", JSON.stringify({
+        playerId: playerId,
+        playerName: playerName,
+        playerBasePrice: basePrice
       }));
       return "success";
     }
