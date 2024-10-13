@@ -1,4 +1,5 @@
 import { RedisClientType, createClient } from "redis";
+import { addPlayerBody, messagesFromApiType } from "./types/streamType";
 export default class redisManager{
   private client:RedisClientType;
   private publisher:RedisClientType;
@@ -25,34 +26,11 @@ export default class redisManager{
        return this.instance;
     }
   }
-  public async publishBid({playerId,bidderId, amnt}:{
-    playerId:string,
-    bidderId:string,
-    amnt:number
-  }):Promise<string>{
+  public async publish({type,body}:messagesFromApiType):Promise<string>{
     try {
-      await this.publisher.lPush("bid", JSON.stringify({
-        playerId: playerId,
-        bidderId: bidderId,
-        amnt: amnt
-      }));
-      return "success";
-    }
-    catch (err) {
-      console.log(err);
-      return "failed";
-    }
-  }
-  public async publishPlayer({playerId,playerName, basePrice}:{
-    playerId:string,
-    playerName:string,
-    basePrice:number,
-  }):Promise<string>{
-    try {
-      await this.publisher.lPush("bid", JSON.stringify({
-        playerId: playerId,
-        playerName: playerName,
-        playerBasePrice: basePrice
+      await this.publisher.lPush("messagesFromApi", JSON.stringify({
+        type:type,
+        body:body
       }));
       return "success";
     }

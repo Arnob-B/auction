@@ -1,8 +1,9 @@
 import { RedisClientType, createClient } from "redis";
 import { inputType } from "../types/in";
+import { messagesFromApiType } from "../types/streamType";
 export default class redisManager{
-  private client:RedisClientType;
-  private publisher:RedisClientType;
+  private client:RedisClientType; // takes from queue
+  private publisher:RedisClientType; // publishes to the sub
   private static instance: redisManager ;
   private initiated:boolean;
   private constructor(){
@@ -26,8 +27,8 @@ export default class redisManager{
        return this.instance;
     }
   }
-  public async pullQueue():Promise<inputType>{
-    const res = await this.client.rPop("bid");
-    return res;
+  public async pullQueue():Promise<messagesFromApiType>{
+    const res = await this.client.rPop("messagesFromApi" as string);
+    return JSON.parse(res);
   }
 };

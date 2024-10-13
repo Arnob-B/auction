@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npx tsc -b && node build/index.js"
+    "dev": "npx tsc -b && node build/index.js",
+    "nmon": "npx nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"npm run dev\""
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "nodemon": "^3.1.7",
     "redis": "^4.7.0",
     "typescript": "^5.6.3"
   }

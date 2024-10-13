@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/redisManager.ts"],"version":"5.6.3"}
+{"root":["./src/index.ts","./src/redismanager.ts","./src/types/streamtype.ts"],"version":"5.6.3"}
