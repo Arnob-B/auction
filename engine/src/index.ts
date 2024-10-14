@@ -8,15 +8,18 @@ import { userType } from "./types/user";
 
 async function main() {
   await redisManager.getInstance();
+  let msg = "";
   while (true){
     const res:messagesFromApiType = await redisManager.getInstance().pullQueue();
     if(res)
     switch(res.type){
       case addUser:
-        userManager.getInstance().addUser({userId:res.body.userId, amnt:5000});
+        msg = userManager.getInstance().addUser({userId:res.body.userId, amnt:5000});
+        redisManager.getInstance().publish(res.clientId,msg);
         break;
       case addPlayer:
-        player.getInstance().setPlayer(res.body);
+        msg = player.getInstance().setPlayer(res.body);
+        redisManager.getInstance().publish(res.clientId,msg);
         break;
       case placeBid:
         const {playerId, bidderId, bidAmnt} = res.body ;
@@ -36,21 +39,24 @@ async function main() {
                 // updating the player 
                 const newPrice = player.getInstance().currentPrice = bidAmnt;
                 console.log("new Price set ", newPrice);
-                player.getInstance().showPlayer();
+                player.getInstance().showPlayer()
+                redisManager.getInstance().publish(res.clientId,player.getInstance().showPlayer());
               }
             }
           }
         }
         break;
       case banUser:
-        userManager.getInstance().banUser(res.body);
+        msg = userManager.getInstance().banUser(res.body);
+        redisManager.getInstance().publish(res.clientId,msg);
         break;
       case sellPlayer:
-        player.getInstance().sellPlayer();
-        console.log("sell Player");
+        msg = player.getInstance().sellPlayer();
+        redisManager.getInstance().publish(res.clientId,msg);
         break;
       default:
         console.log("unkown behaviour");
+        redisManager.getInstance().publish("garbage","give something usefull");
         console.log(res);
     }
   }

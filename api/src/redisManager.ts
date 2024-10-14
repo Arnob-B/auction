@@ -1,20 +1,22 @@
 import { RedisClientType, createClient } from "redis";
 import { addPlayerBody, messagesFromApiType } from "./types/streamType";
 export default class redisManager{
+  private subscriber:RedisClientType; 
   private client:RedisClientType;
-  private publisher:RedisClientType;
   private static instance: redisManager ;
   private initiated:boolean;
   private constructor(){
     console.log("redis Manager instialization started");
+    this.subscriber = createClient();
     this.client = createClient();
-    this.publisher = createClient();
+    this.subscriber.connect();
     this.client.connect();
-    this.publisher.connect();
     this.initiated = false;
     this.init();
   }
   public async init(){
+    await this.subscriber;
+    await this.client;
     console.log("redis Manager instialization completed");
     this.initiated=true;
   }
@@ -26,17 +28,29 @@ export default class redisManager{
        return this.instance;
     }
   }
-  public async publish({type,body}:messagesFromApiType):Promise<string>{
-    try {
-      await this.publisher.lPush("messagesFromApi", JSON.stringify({
-        type:type,
-        body:body
-      }));
-      return "success";
-    }
-    catch (err) {
-      console.log(err);
-      return "failed";
-    }
+  public async sendAndAwait({ type, body ,clientId}: messagesFromApiType): Promise<string> {
+    return new Promise(async (resolve)=>{
+      try {
+        this.subscriber.subscribe(clientId, (message) => {
+          resolve(message);
+        });
+        await this.client.lPush("messagesFromApi", JSON.stringify({
+          type: type,
+          body: body,
+          clientId:clientId
+        }));
+      }
+      catch (err) {
+        console.log(err);
+        resolve("failed");
+        return;
+      }
+    })
   }
+  public getRandom(){
+    const rand =  Math.random().toString(36).substring(2,);
+    console.log(rand)
+    return rand;
+  }
+
 };

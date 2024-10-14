@@ -23,17 +23,17 @@ export default class player{
     }
     return this.instance = new player();
   }
-  public setPlayer(stats:playerStat){
-    if(this.id === stats.playerId) return;
+  public setPlayer(stats:playerStat):string{
+    if(this.id === stats.playerId) return "player already in bid"
     this.id = stats.playerId;
     this.name = stats.playerName;
     this.basePrice = stats.playerBasePrice;
     this.currentPrice = this.basePrice;
     this.currentWinningBidder = "";
-    console.log("new player set");
+    return "new player set";
   }
   public sellPlayer(){
-    console.log("playerSold");
+    return "player sold"
     //db calls
   }
   public getPlayerId(){
@@ -46,11 +46,13 @@ export default class player{
     return this.getPlayer
   }
   public showPlayer(){
-  console.log( this.id)
-  console.log( this.name)
-  console.log( this.basePrice)
-  console.log( this.currentPrice)
-  console.log( this.incrementPrice)
-  console.log( this.currentWinningBidder)
+    return JSON.stringify({
+      id:this.id,
+      name:this.name,
+      basePrice:this.basePrice,
+      currentPrice:this.currentPrice,
+      incrementPrice:this.incrementPrice,
+      currentWinningBidder:this.currentWinningBidder
+    });
   }
 }

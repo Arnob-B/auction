@@ -21,12 +21,17 @@ export class userManager{
     if(!this.allUsers.find(e=>e.userId === userDetails.userId))
     {
     this.allUsers.push(userDetails);
-    console.log("new user added");
+    return "new user added";
     }
+    return "user already present"
   }
   public banUser(userDetails:banUserBody){
     if(!this.bannedUser.find(e=> e===userDetails.userId))
-    this.bannedUser.push(userDetails.userId);
+    {
+      this.bannedUser.push(userDetails.userId);
+      return "user banned"
+    }
+    return "user already in ban list"
   }
   public isBanned(id:string):boolean{
     return this.bannedUser.find(e=> e===id) ? true:false;

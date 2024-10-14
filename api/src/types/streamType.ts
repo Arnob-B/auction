@@ -23,18 +23,23 @@ export type placeBidBody = {
 export const sellPlayer = "SELL_PLAYER";
 export type messagesFromApiType = {
   type : typeof addPlayer,
-  body : addPlayerBody
+  body : addPlayerBody,
+  clientId:string
 } | {
   type: typeof addUser,
   body: addUserBody
+  clientId:string
 }
  | {
   type: typeof banUser,
   body: banUserBody
+  clientId:string
 }| {
   type: typeof placeBid,
   body: placeBidBody
+  clientId:string
 }|{
   type:typeof sellPlayer,
   body?:string
+  clientId:string
 };

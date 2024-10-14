@@ -31,4 +31,7 @@ export default class redisManager{
     const res = await this.client.rPop("messagesFromApi" as string);
     return JSON.parse(res);
   }
+  public async publish(uid:string,msg:string){
+    await this.publisher.publish(uid,msg);
+  }
 };

@@ -13,13 +13,14 @@ app.post('/bid',async(req,res)=>{
   const {playerId, bidderId, amnt}= req.body;
   if(playerId !==undefined && bidderId !== undefined && amnt !== undefined)
   {
-    const response = await redisManager.getInstance().publish({
+    const response = await redisManager.getInstance().sendAndAwait({
       type:placeBid,
       body: {
         playerId: playerId,
         bidderId: bidderId,
         bidAmnt: amnt
-      }
+      },
+      clientId:redisManager.getInstance().getRandom()
     });
     res.json({ msg: response });
   }

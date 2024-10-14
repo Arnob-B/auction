@@ -5,13 +5,14 @@ const route=Router();
 route.post('/addPlayer',async(req,res)=>{
   const {id,name,basePrice} = req.body;
   if(id !==undefined && name !==undefined && basePrice !==undefined){
-    const response = await redisManager.getInstance().publish({
+    const response = await redisManager.getInstance().sendAndAwait({
       type:addPlayer,
       body:{
         playerId: id,
         playerName: name,
         playerBasePrice: basePrice
-      }
+      },
+      clientId:redisManager.getInstance().getRandom()
     });
     res.json({ msg: response });
   }
@@ -23,9 +24,10 @@ route.post('/addPlayer',async(req,res)=>{
 route.post('/banUser',async (req,res)=>{
   const { userId } = req.body;
   if (userId !== undefined) {
-    const response = await redisManager.getInstance().publish({
+    const response = await redisManager.getInstance().sendAndAwait({
       type: banUser,
-      body: { userId: userId }
+      body: { userId: userId },
+      clientId:redisManager.getInstance().getRandom()
     });
     return res.json({ msg: response });
   }
@@ -36,9 +38,10 @@ route.post('/banUser',async (req,res)=>{
 route.post("/addUser",async(req,res)=>{
   const { userId } = req.body;
   if (userId !== undefined) {
-    const response = await redisManager.getInstance().publish({
+    const response = await redisManager.getInstance().sendAndAwait({
       type: addUser,
-      body: { userId: userId }
+      body: { userId: userId },
+      clientId:redisManager.getInstance().getRandom()
     });
     return res.json({ msg: response });
   }
@@ -46,8 +49,9 @@ route.post("/addUser",async(req,res)=>{
 });
 
 route.post("/sellPlayer",async(req,res)=>{
-  const response = await redisManager.getInstance().publish({
-    type:sellPlayer
+  const response = await redisManager.getInstance().sendAndAwait({
+    type:sellPlayer,
+    clientId: redisManager.getInstance().getRandom()
   });
   res.json({msg:response});
 })
