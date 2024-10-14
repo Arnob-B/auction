@@ -19,6 +19,7 @@ export type placeBidBody = {
   bidAmnt: number
 }
 
+export const getCurrentPlayer = "GET_CURRENT_PLAYER"
 
 export const sellPlayer = "SELL_PLAYER";
 export type messagesFromApiType = {
@@ -42,4 +43,8 @@ export type messagesFromApiType = {
   type:typeof sellPlayer,
   body?:string
   clientId:string
+}|{
+  type:typeof getCurrentPlayer,
+  body?:string,
+  clientId:string,
 };

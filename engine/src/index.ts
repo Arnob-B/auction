@@ -1,7 +1,7 @@
 import redisManager from "./utils/redisManager";
 import { inputType } from "./types/in";
 import { userManager } from "./utils/userManager";
-import { addPlayer, addUser, banUser, messagesFromApiType, placeBid } from "./types/streamType";
+import { addPlayer, addUser, banUser, getCurrentPlayer, messagesFromApiType, placeBid } from "./types/streamType";
 import { sellPlayer } from "./types/streamType";
 import player from "./utils/playerManager";
 import { userType } from "./types/user";
@@ -54,6 +54,9 @@ async function main() {
         msg = player.getInstance().sellPlayer();
         redisManager.getInstance().publish(res.clientId,msg);
         break;
+      case getCurrentPlayer:
+        msg = player.getInstance().id;
+        redisManager.getInstance().publish(res.clientId,msg);
       default:
         console.log("unkown behaviour");
         redisManager.getInstance().publish("garbage","give something usefull");

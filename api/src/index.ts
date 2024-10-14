@@ -1,13 +1,20 @@
 import redisManager from "./redisManager";
 import adminRoute from './routes/adminRoute'
 import express from "express"
-import { addPlayer, messagesFromApiType, placeBid } from "./types/streamType";
+import { addPlayer, getCurrentPlayer, messagesFromApiType, placeBid } from "./types/streamType";
 redisManager.getInstance();
 const app = express();
 app.use(express.json());
 
 
 app.use("/admin",adminRoute);
+app.get("/getPlayer",(req, res)=>{
+  const response = redisManager.getInstance().sendAndAwait({
+    type: getCurrentPlayer,
+    clientId: redisManager.getInstance().getRandom()
+  });
+  res.json({msg:response});
+})
 
 app.post('/bid',async(req,res)=>{
   const {playerId, bidderId, amnt}= req.body;
