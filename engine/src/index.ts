@@ -57,6 +57,7 @@ async function main() {
       case getCurrentPlayer:
         msg = player.getInstance().id;
         redisManager.getInstance().publish(res.clientId,msg);
+        break;
       default:
         console.log("unkown behaviour");
         redisManager.getInstance().publish("garbage","give something usefull");

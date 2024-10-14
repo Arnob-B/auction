@@ -23,6 +23,15 @@ function LeaderBoard(){
     ['user2', 1500],
     ['user1', 2000]
   ]);
+  useEffect(()=>{
+    fetch("http://localhost:3000/getCurrentPlayer").then(res =>
+    {
+      res.json().then(data =>{
+        console.log(data);
+      });
+    }
+    );
+  },[]);
   return(
     <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
       <div className="p-4 border-b border-gray-700">

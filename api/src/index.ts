@@ -1,18 +1,26 @@
 import redisManager from "./redisManager";
 import adminRoute from './routes/adminRoute'
 import express from "express"
+const cors = require('cors')
 import { addPlayer, getCurrentPlayer, messagesFromApiType, placeBid } from "./types/streamType";
 redisManager.getInstance();
 const app = express();
 app.use(express.json());
 
 
+const corsOption = {
+  origin: '*', // Allow only your Next.js app
+  methods: ['GET', 'POST'], // Specify allowed methods
+  allowedHeaders: ['Content-Type'], // Specify allowed headers
+}
+app.use(cors(corsOption));
 app.use("/admin",adminRoute);
-app.get("/getPlayer",(req, res)=>{
-  const response = redisManager.getInstance().sendAndAwait({
+app.get("/getCurrentPlayer",async (req, res)=>{
+  const response = await redisManager.getInstance().sendAndAwait({
     type: getCurrentPlayer,
     clientId: redisManager.getInstance().getRandom()
   });
+  console.log(response);
   res.json({msg:response});
 })
 
