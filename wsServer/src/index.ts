@@ -1,8 +1,8 @@
 import { WebSocketServer } from "ws";
 import express from "express"
-import User from "./userManager";
+import User from "./utils/userManager";
 import { publish } from "./types/engineMessage";
-import userManager from "./userManager";
+import userManager from "./utils/userManager";
 const app = express();
 const server = app.listen(3002,()=>{
   console.log("WS server started on port",3002);

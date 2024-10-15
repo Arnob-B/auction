@@ -5,7 +5,7 @@ type BIDPLACE = {
   type : typeof publish,
   cat : typeof bidPlace,
   playerId:string,
-  winningBidderId:string,
+  bidderId:string,
   currentPrice :number,
   nextPrice :number
 }

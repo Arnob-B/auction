@@ -54,9 +54,6 @@ export default class player{
   public getCurrentPrice(){
     return this.currentPrice;
   }
-  public getPlayer(){
-    return this.getPlayer
-  }
   public showPlayer(){
     return JSON.stringify({
       id:this.id,

@@ -27,7 +27,6 @@ async function main() {
         if (player.getInstance().getPlayerId() === playerId) {
           console.log("player is present");
           if (bidAmnt === player.getInstance().nextPrice) {
-            console.log("amount set is greater than base price");
             if (!userManager.getInstance().isBanned(bidderId)) {
               //updating the user
               console.log("user is not in ban list");
