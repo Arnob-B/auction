@@ -2,16 +2,32 @@
 
 import { useEffect, useState } from "react"
 
-function Card(){
+type playerDetailsType = {
+  id : string,
+  name: string,
+  basePrice : number,
+  currentPrice:number
+}
+function Card({playerDetails}:{playerDetails:playerDetailsType}){
+  const [playerStats,setPlayerStats] = useState();
+  if(playerDetails.id === "") return (
+    <div>
+      no player listed now
+    </div>
+  )
   return (
     <div className="max-w-xs mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden">
       <img className="w-full h-48 object-cover" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/C._Ronaldo_-_Ballon_d%27Or_2014.jpg/261px-C._Ronaldo_-_Ballon_d%27Or_2014.jpg" alt="Player Image"/>
         <div className="p-4">
-          <h2 className="text-xl font-bold text-white">Player Name</h2>
-          <p className="text-gray-300">Stats: Goals - 20 | Assists - 10 | Matches - 30</p>
+          <h2 className="text-xl font-bold text-white">{playerDetails.name}</h2>
+          <p className="text-gray-300"></p>
           <div className="mt-4">
             <span className="text-lg font-semibold text-white">Base Price:</span>
-            <span className="text-lg font-bold text-green-400">$1,000,000</span>
+            <span className="text-lg font-bold text-green-400">{playerDetails.basePrice}</span>
+          </div>
+          <div className="mt-4">
+            <span className="text-lg font-semibold text-white">currentPrice Price:</span>
+            <span className="text-lg font-bold text-green-400">{playerDetails.currentPrice}</span>
           </div>
         </div>
     </div>
@@ -71,15 +87,24 @@ function PlaceBid({bidAmnt}:{bidAmnt:number}) {
   )
 }
 export default function Page(){
-  const [playerId, setPlayerId] = useState<string>("");
+  const [playerDetails, setPlayerDetails] = useState<playerDetailsType>({
+    id: "",
+    name: "",
+    basePrice: 0,
+    currentPrice: 0
+  });
   const [nextBid, setNextBid] = useState<number>(0);
   useEffect(() => {
     fetch("http://localhost:3000/getCurrentPlayer").then(res => {
       res.json().then(data => {
-        setPlayerId(data.msg.id);
-        setNextBid(data.msg.nextPrice);
-        console.log(data.msg);
-        console.log(data.msg.nextbid);
+        const newObj:playerDetailsType = {
+          id: data.msg.id,
+          name:data.msg.name,
+          currentPrice:data.msg.currentPrice,
+          basePrice : data.msg.basePrice
+        };
+        setPlayerDetails(newObj);
+        setNextBid(data.msg.nextBid);
       });
     }
     );
@@ -87,7 +112,7 @@ export default function Page(){
   console.log(nextBid);
   return(
     <div className="w-screen h-screen flex-col items-center">
-      <Card></Card>
+      <Card playerDetails={playerDetails}></Card>
       <PlaceBid bidAmnt={nextBid}></PlaceBid>
       <LeaderBoard></LeaderBoard>
     </div>

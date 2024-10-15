@@ -39,10 +39,10 @@ async function main() {
                 player.getInstance().currentPrice = bidAmnt;
                 player.getInstance().nextPrice = player.getInstance().currentPrice+player.getInstance().incrementPrice;
                 redisManager.getInstance().publish(res.clientId,player.getInstance().showPlayer());
-              }
-            }
-          }
-        }
+              }else redisManager.getInstance().publish(res.clientId,"you are not a valid user")
+            }else redisManager.getInstance().publish(res.clientId,"you are banned")
+          }else redisManager.getInstance().publish(res.clientId,"price is not upto the bid mark")
+        }else redisManager.getInstance().publish(res.clientId,"you chose wrong player");
         break;
       case banUser:
         msg = userManager.getInstance().banUser(res.body);
@@ -55,9 +55,10 @@ async function main() {
       case getCurrentPlayer:
         msg = JSON.stringify({
           id: player.getInstance().id,
-          currenPrice:player.getInstance().currentPrice,
-          currentWinner:player.getInstance().currentWinningBidder,
-          nextPrice:player.getInstance().nextPrice
+          name:player.getInstance().name,
+          basePrice:player.getInstance().basePrice,
+          currentPrice:player.getInstance().currentPrice,
+          nextBid:player.getInstance().nextPrice
         });
         redisManager.getInstance().publish(res.clientId,msg);
         break;

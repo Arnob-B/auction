@@ -17,7 +17,7 @@ export default class player{
     this.currentWinningBidder="";
     this.basePrice = 0;
     this.currentPrice = 0;
-    this.incrementPrice = 0;
+    this.incrementPrice = 20;
     this.nextPrice = this.currentPrice+ this.incrementPrice;
   }
   public static getInstance(){
@@ -33,7 +33,7 @@ export default class player{
     this.basePrice = stats.playerBasePrice;
     this.currentPrice = this.basePrice;
     this.currentWinningBidder = "";
-    this.nextPrice = this.currentPrice+ this.incrementPrice;
+    this.nextPrice = this.basePrice;
     return "new player set";
   }
   public sellPlayer(){
