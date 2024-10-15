@@ -20,8 +20,7 @@ app.get("/getCurrentPlayer",async (req, res)=>{
     type: getCurrentPlayer,
     clientId: redisManager.getInstance().getRandom()
   });
-  console.log(response);
-  res.json({msg:response});
+  res.json({msg:JSON.parse(response)});
 })
 
 app.post('/bid',async(req,res)=>{

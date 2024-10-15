@@ -23,15 +23,7 @@ function LeaderBoard(){
     ['user2', 1500],
     ['user1', 2000]
   ]);
-  useEffect(()=>{
-    fetch("http://localhost:3000/getCurrentPlayer").then(res =>
-    {
-      res.json().then(data =>{
-        console.log(data);
-      });
-    }
-    );
-  },[]);
+
   return(
     <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
       <div className="p-4 border-b border-gray-700">
@@ -50,7 +42,8 @@ function LeaderBoard(){
     </div>
   )
 }
-function PlaceBid() {
+function PlaceBid({bidAmnt}:{bidAmnt:number}) {
+  console.log("here ", bidAmnt);
   return (
     <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
       <div className="p-4">
@@ -70,7 +63,7 @@ function PlaceBid() {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
           >
-            Place Bid
+            {bidAmnt}
           </button>
         </form>
       </div>
@@ -78,12 +71,24 @@ function PlaceBid() {
   )
 }
 export default function Page(){
-  useEffect(()=>{
-  });
+  const [playerId, setPlayerId] = useState<string>("");
+  const [nextBid, setNextBid] = useState<number>(0);
+  useEffect(() => {
+    fetch("http://localhost:3000/getCurrentPlayer").then(res => {
+      res.json().then(data => {
+        setPlayerId(data.msg.id);
+        setNextBid(data.msg.nextPrice);
+        console.log(data.msg);
+        console.log(data.msg.nextbid);
+      });
+    }
+    );
+  }, []);
+  console.log(nextBid);
   return(
     <div className="w-screen h-screen flex-col items-center">
       <Card></Card>
-      <PlaceBid></PlaceBid>
+      <PlaceBid bidAmnt={nextBid}></PlaceBid>
       <LeaderBoard></LeaderBoard>
     </div>
   )

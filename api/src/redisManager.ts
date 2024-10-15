@@ -32,6 +32,7 @@ export default class redisManager{
     return new Promise(async (resolve)=>{
       try {
         this.subscriber.subscribe(clientId, (message) => {
+          this.subscriber.unsubscribe(clientId);
           resolve(message);
         });
         await this.client.lPush("messagesFromApi", JSON.stringify({

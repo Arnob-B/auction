@@ -1,4 +1,5 @@
 import { playerStat } from "../types/playerStats";
+import { userManager } from "./userManager";
 
 //singleton
 export default class player{
@@ -8,6 +9,7 @@ export default class player{
   public currentPrice:number;
   public incrementPrice:number;
   public currentWinningBidder:string;
+  public nextPrice:number;
   public static instance:player;
   private constructor(){
     this.id = "";
@@ -16,6 +18,7 @@ export default class player{
     this.basePrice = 0;
     this.currentPrice = 0;
     this.incrementPrice = 0;
+    this.nextPrice = this.currentPrice+ this.incrementPrice;
   }
   public static getInstance(){
     if(this.instance){
@@ -30,11 +33,20 @@ export default class player{
     this.basePrice = stats.playerBasePrice;
     this.currentPrice = this.basePrice;
     this.currentWinningBidder = "";
+    this.nextPrice = this.currentPrice+ this.incrementPrice;
     return "new player set";
   }
   public sellPlayer(){
+    const winnerId = this.currentWinningBidder;
+    if( winnerId === ""){
+      //db call with player remaining unsold
+    }
+    else{
+      const ind = userManager.getInstance().allUsers.findIndex(e=> e.userId === winnerId);
+      userManager.getInstance().allUsers[ind].amnt-= this.currentPrice;
+      //db call to update player profile
+    }
     return "player sold"
-    //db calls
   }
   public getPlayerId(){
     return this.id;

@@ -26,7 +26,7 @@ async function main() {
         console.log("initial req ->",playerId, bidderId, bidAmnt);
         if (player.getInstance().getPlayerId() === playerId) {
           console.log("player is present");
-          if (bidAmnt >= player.getInstance().getCurrentPrice() + player.getInstance().incrementPrice) {
+          if (bidAmnt === player.getInstance().nextPrice) {
             console.log("amount set is greater than base price");
             if (!userManager.getInstance().isBanned(bidderId)) {
               //updating the user
@@ -34,12 +34,10 @@ async function main() {
               const user = userManager.getInstance().allUsers.find(e=>e.userId === bidderId);
               if(user){
                 console.log("user is present in local db");
-                user.amnt -= bidAmnt;
                 player.getInstance().currentWinningBidder = bidderId;
                 // updating the player 
-                const newPrice = player.getInstance().currentPrice = bidAmnt;
-                console.log("new Price set ", newPrice);
-                player.getInstance().showPlayer()
+                player.getInstance().currentPrice = bidAmnt;
+                player.getInstance().nextPrice = player.getInstance().currentPrice+player.getInstance().incrementPrice;
                 redisManager.getInstance().publish(res.clientId,player.getInstance().showPlayer());
               }
             }
@@ -55,7 +53,12 @@ async function main() {
         redisManager.getInstance().publish(res.clientId,msg);
         break;
       case getCurrentPlayer:
-        msg = player.getInstance().id;
+        msg = JSON.stringify({
+          id: player.getInstance().id,
+          currenPrice:player.getInstance().currentPrice,
+          currentWinner:player.getInstance().currentWinningBidder,
+          nextPrice:player.getInstance().nextPrice
+        });
         redisManager.getInstance().publish(res.clientId,msg);
         break;
       default:
