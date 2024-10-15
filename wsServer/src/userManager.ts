@@ -15,7 +15,7 @@ export class User{
     this.ws.on('message',(message)=>{
       const msg:engineMessage = JSON.parse(message.toString());
       if(msg.type === publish)
-      {userManager.getInstance().emitMsg(msg.body);}
+      {userManager.getInstance().emitMsg(msg);}
     })
     this.ws.on("close",(message)=>{
       console.log(`${this.id} closed`);
@@ -40,7 +40,7 @@ export default class userManager{
   public delUser(id:string){
     this.allUsers.delete(id);
   }
-  public emitMsg(msg:any){
+  public emitMsg(msg:engineMessage){
     this.allUsers.forEach(e=>e.sendMsg(msg));
   }
   public getRandom():string{
