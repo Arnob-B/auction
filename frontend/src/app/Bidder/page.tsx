@@ -33,12 +33,7 @@ function Card({playerDetails}:{playerDetails:playerDetailsType}){
     </div>
   )
 }
-function LeaderBoard(){
-  const [bidderlist, setBidderList] = useState<[string, number][]>([
-    ['user3', 1000],
-    ['user2', 1500],
-    ['user1', 2000]
-  ]);
+function LeaderBoard({bidderList}){
 
   return(
     <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
@@ -46,7 +41,7 @@ function LeaderBoard(){
         <h2 className="text-xl font-bold text-white text-center">Bidding Leaderboard</h2>
       </div>
       <ul className="divide-y divide-gray-700 flex flex-col-reverse">
-        {bidderlist.map(e => {
+        {bidderList.map(e => {
           return (
             <li className="flex justify-between items-center p-4">
               <span className="text-white">{e[0]}</span>
@@ -61,7 +56,6 @@ function LeaderBoard(){
 function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
   const [id,setId] = useState<string>("");
   function submit(){
-    console.log("here")
     fetch('http://localhost:3000/bid', {
       method:"POST",
       headers: {
@@ -118,9 +112,12 @@ export default function Page(){
     basePrice: 0,
     currentPrice: 0
   });
+  const [bidderList, setBidderList] = useState<[string, number][]>([
+  ]);
   const [nextBid, setNextBid] = useState<number>(0);
-  let ws:WebSocket;
   useEffect(() => {
+    let ws = new WebSocket('ws://localhost:3002');
+    console.log("first use fetch")
     fetch("http://localhost:3000/getCurrentPlayer",{cache:'no-cache'}).then(res => {
       res.json().then(data => {
         const newObj:playerDetailsType = {
@@ -134,15 +131,31 @@ export default function Page(){
       });
     }
     );
-    ws = new WebSocket('ws://localhost:3002');
-    ws.addEventListener("message",(message)=>{
-    });
+    ws.onmessage=message=>{
+      console.log("here")
+      try {
+        const data = JSON.parse(message.data);
+        if (data.type === "PUBLISH")
+        {
+          setPlayerDetails(prev => {
+            const newObj = { ...prev };
+            newObj.currentPrice = data.currentPrice;
+            console.log("here->", newObj)
+            return newObj;
+          });
+          setNextBid(data.nextPrice);
+          setBidderList(prev=> [...prev,[data.bidderId,data.currentPrice]]);
+        }
+      }
+      catch(err) {console.log(err)};
+    };
   }, []);
+  console.log(">_<")
   return(
     <div className="w-screen h-screen flex-col items-center">
       <Card playerDetails={playerDetails}></Card>
       <PlaceBid bidAmnt={nextBid} playerId={playerDetails.id} ></PlaceBid>
-      <LeaderBoard></LeaderBoard>
+      <LeaderBoard bidderList={bidderList}></LeaderBoard>
     </div>
   )
 }

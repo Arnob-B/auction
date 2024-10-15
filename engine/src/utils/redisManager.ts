@@ -16,6 +16,8 @@ export default class redisManager{
     this.init();
   }
   public async init(){
+    await this.client;
+    await this.publish;
     console.log("redis Manager instialization completed");
     this.initiated=true;
   }
@@ -27,9 +29,11 @@ export default class redisManager{
        return this.instance;
     }
   }
-  public async pullQueue():Promise<messagesFromApiType>{
+  public async pullQueue():Promise<messagesFromApiType|null>{
     const res = await this.client.rPop("messagesFromApi" as string);
+    if(res)
     return JSON.parse(res);
+    return null
   }
   public async publish(uid:string,msg:string){
     await this.publisher.publish(uid,msg);

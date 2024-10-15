@@ -5,12 +5,14 @@ import { addPlayer, addUser, banUser, getCurrentPlayer, messagesFromApiType, pla
 import { sellPlayer } from "./types/streamType";
 import player from "./utils/playerManager";
 import { userType } from "./types/user";
+import wsManager from "./utils/wsManager";
 
 async function main() {
   await redisManager.getInstance();
+  await wsManager.getInstance();
   let msg = "";
   while (true){
-    const res:messagesFromApiType = await redisManager.getInstance().pullQueue();
+    const res:messagesFromApiType|null = await redisManager.getInstance().pullQueue();
     if(res)
     switch(res.type){
       case addUser:
@@ -37,6 +39,7 @@ async function main() {
                 // updating the player 
                 player.getInstance().currentPrice = bidAmnt;
                 player.getInstance().nextPrice = player.getInstance().currentPrice+player.getInstance().incrementPrice;
+                wsManager.getInstance().bidPlaced();
                 redisManager.getInstance().publish(res.clientId,player.getInstance().showPlayer());
               }else redisManager.getInstance().publish(res.clientId,"you are not a valid user")
             }else redisManager.getInstance().publish(res.clientId,"you are banned")

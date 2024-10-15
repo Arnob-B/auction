@@ -10,9 +10,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/ws": "^8.5.12",
     "nmon": "^0.2.2",
     "nodemon": "^3.1.7",
     "redis": "^4.7.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "ws": "^8.18.0"
   }
 }
