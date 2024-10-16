@@ -1,4 +1,5 @@
 export type userType = {
   userId:string,
-  amnt:number,
+  userName:string,
+  balance:number
 }

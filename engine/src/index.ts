@@ -2,10 +2,11 @@ import redisManager from "./utils/redisManager";
 import { inputType } from "./types/in";
 import { userManager } from "./utils/userManager";
 import { addPlayer, addUser, banUser, getCurrentPlayer, messagesFromApiType, placeBid } from "./types/streamType";
-import { sellPlayer } from "./types/streamType";
+import { sellPlayer ,addUserBody} from "./types/streamType";
 import player from "./utils/playerManager";
 import { userType } from "./types/user";
 import wsManager from "./utils/wsManager";
+import { RedisFlushModes } from "redis";
 
 async function main() {
   await redisManager.getInstance();
@@ -16,7 +17,7 @@ async function main() {
     if(res)
     switch(res.type){
       case addUser:
-        msg = userManager.getInstance().addUser({userId:res.body.userId, amnt:5000});
+        msg = userManager.getInstance().addUser(res.body.userId,res.body.userName,res.body.balance);
         redisManager.getInstance().publish(res.clientId,msg);
         break;
       case addPlayer:
@@ -27,27 +28,26 @@ async function main() {
         const {playerId, bidderId, bidAmnt} = res.body ;
         console.log("initial req ->",playerId, bidderId, bidAmnt);
         if (player.getInstance().getPlayerId() === playerId) {
-          console.log("player is present");
           if (bidAmnt === player.getInstance().nextPrice) {
             if (!userManager.getInstance().isBanned(bidderId)) {
-              //updating the user
-              console.log("user is not in ban list");
-              const user = userManager.getInstance().allUsers.find(e=>e.userId === bidderId);
+              const user = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === bidderId);
               if(user){
-                console.log("user is present in local db");
-                player.getInstance().currentWinningBidder = bidderId;
-                // updating the player 
-                player.getInstance().currentPrice = bidAmnt;
-                player.getInstance().nextPrice = player.getInstance().currentPrice+player.getInstance().incrementPrice;
-                wsManager.getInstance().bidPlaced();
-                redisManager.getInstance().publish(res.clientId,player.getInstance().showPlayer());
-              }else redisManager.getInstance().publish(res.clientId,"you are not a valid user")
+                if(user.getDetails().balance < bidAmnt) redisManager.getInstance().publish(res.clientId,"you dont have sufficient money");
+                else {
+                  player.getInstance().currentWinningBidder = bidderId;
+                  // updating the player 
+                  player.getInstance().currentPrice = bidAmnt;
+                  player.getInstance().nextPrice = player.getInstance().currentPrice + player.getInstance().incrementPrice;
+                  wsManager.getInstance().bidPlaced();
+                  redisManager.getInstance().publish(res.clientId, player.getInstance().showPlayer());
+                }
+              }else redisManager.getInstance().publish(res.clientId,"you are not registered for the auction")
             }else redisManager.getInstance().publish(res.clientId,"you are banned")
           }else redisManager.getInstance().publish(res.clientId,"price is not upto the bid mark")
         }else redisManager.getInstance().publish(res.clientId,"you chose wrong player");
         break;
       case banUser:
-        msg = userManager.getInstance().banUser(res.body);
+        msg = userManager.getInstance().banUser(res.body.userId);
         redisManager.getInstance().publish(res.clientId,msg);
         break;
       case sellPlayer:

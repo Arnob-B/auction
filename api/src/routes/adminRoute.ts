@@ -36,11 +36,11 @@ route.post('/banUser',async (req,res)=>{
 
 //@ts-ignore
 route.post("/addUser",async(req,res)=>{
-  const { userId } = req.body;
-  if (userId !== undefined) {
+  const { userId,userName,balance} = req.body;
+  if (userId !== undefined && userName !==undefined && balance !==undefined) {
     const response = await redisManager.getInstance().sendAndAwait({
       type: addUser,
-      body: { userId: userId },
+      body: { userId: userId ,userName:userName,balance:balance},
       clientId:redisManager.getInstance().getRandom()
     });
     return res.json({ msg: response });

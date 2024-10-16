@@ -6,7 +6,9 @@ export type addPlayerBody = {
 }
 export const addUser = "ADD_USER";
 export type addUserBody = {
-  userId:string
+  userId:string,
+  userName:string,
+  balance:number,
 }
 export const banUser = "BAN_USER";
 export type banUserBody = {

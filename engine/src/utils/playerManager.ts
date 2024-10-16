@@ -42,8 +42,9 @@ export default class player{
       //db call with player remaining unsold
     }
     else{
-      const ind = userManager.getInstance().allUsers.findIndex(e=> e.userId === winnerId);
-      userManager.getInstance().allUsers[ind].amnt-= this.currentPrice;
+      const ind = userManager.getInstance().allUsers.findIndex(e=> e.getDetails().userId === winnerId);
+      let bal = userManager.getInstance().allUsers[ind].getDetails().balance;
+      userManager.getInstance().allUsers[ind].setBalance(bal - this.currentPrice);
       //db call to update player profile
     }
     return "player sold"

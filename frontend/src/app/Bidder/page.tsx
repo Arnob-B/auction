@@ -10,11 +10,6 @@ type playerDetailsType = {
 }
 function Card({playerDetails}:{playerDetails:playerDetailsType}){
   const [playerStats,setPlayerStats] = useState();
-  if(playerDetails.id === "") return (
-    <div>
-      no player listed now
-    </div>
-  )
   return (
     <div className="max-w-xs mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden">
       <img className="w-full h-48 object-cover" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/C._Ronaldo_-_Ballon_d%27Or_2014.jpg/261px-C._Ronaldo_-_Ballon_d%27Or_2014.jpg" alt="Player Image"/>
@@ -33,7 +28,7 @@ function Card({playerDetails}:{playerDetails:playerDetailsType}){
     </div>
   )
 }
-function LeaderBoard({bidderList}){
+function LeaderBoard({bidderList}:{bidderList:[string,number][]}){
 
   return(
     <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
@@ -116,7 +111,6 @@ export default function Page(){
   ]);
   const [nextBid, setNextBid] = useState<number>(0);
   useEffect(() => {
-    let ws = new WebSocket('ws://localhost:3002');
     console.log("first use fetch")
     fetch("http://localhost:3000/getCurrentPlayer",{cache:'no-cache'}).then(res => {
       res.json().then(data => {
@@ -131,6 +125,8 @@ export default function Page(){
       });
     }
     );
+    // webSocket server initailization
+    let ws = new WebSocket('ws://localhost:3002');
     ws.onmessage=message=>{
       console.log("here")
       try {
@@ -151,6 +147,11 @@ export default function Page(){
     };
   }, []);
   console.log(">_<")
+  if(playerDetails.id === "")return (
+    <>
+      No player listed now
+    </>
+  )
   return(
     <div className="w-screen h-screen flex-col items-center">
       <Card playerDetails={playerDetails}></Card>

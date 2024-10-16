@@ -1,9 +1,26 @@
 import { banUserBody } from "../types/streamType";
 import { userType } from "../types/user";
-
+export class user{
+  private id:string
+  private name:string
+  private balance;
+  constructor(userId:string,userName:string,balance:number){
+    this.id = userId;
+    this.name = userName;
+    this.balance = balance;
+  }
+  getDetails(){
+    return {
+      userId:this.id,
+      userName:this.name,
+      balance :this.balance,
+    }
+  }
+  setBalance(bal:number){this.balance = bal;}
+};
 export class userManager{
-  public allUsers:Array<userType>;
-  public bannedUser:Array<string>;
+  public allUsers:Array<user>; 
+  public bannedUser:Array<string>; // contains all the banned users
   private static instance:userManager;
   private constructor(){
     this.allUsers = [];
@@ -17,18 +34,18 @@ export class userManager{
        return this.instance;
     }
   }
-  public addUser(userDetails:userType){
-    if(!this.allUsers.find(e=>e.userId === userDetails.userId))
+  public addUser(userId:string,userName:string,balance:number){
+    if(!this.allUsers.find(e=>e.getDetails().userId === userId))
     {
-    this.allUsers.push(userDetails);
-    return "new user added";
+      this.allUsers.push(new user(userId,userName,balance));
+      return "new user added";
     }
     return "user already present"
   }
-  public banUser(userDetails:banUserBody){
-    if(!this.bannedUser.find(e=> e===userDetails.userId))
+  public banUser(userId:string){
+    if(!this.bannedUser.find(e=> e===userId))
     {
-      this.bannedUser.push(userDetails.userId);
+      this.bannedUser.push(userId);
       return "user banned"
     }
     return "user already in ban list"
