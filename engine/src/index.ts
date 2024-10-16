@@ -4,9 +4,7 @@ import { userManager } from "./utils/userManager";
 import { addPlayer, addUser, banUser, getCurrentPlayer, messagesFromApiType, placeBid } from "./types/streamType";
 import { sellPlayer ,addUserBody} from "./types/streamType";
 import player from "./utils/playerManager";
-import { userType } from "./types/user";
 import wsManager from "./utils/wsManager";
-import { RedisFlushModes } from "redis";
 
 async function main() {
   await redisManager.getInstance();
