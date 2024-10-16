@@ -23,7 +23,7 @@ model Player{
   basePrice Int
   isListed Boolean @default(false)
   owner User @relation(fields:[ownerId],references: [id])
-  ownerId String
+  ownerId String @default("")
   bids bids[]
 }
 

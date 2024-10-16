@@ -4,6 +4,6 @@ import dbManager from "./utils/dbManager";
 
 
 const main = async ()=>{
-  dbManager.getInstance();
+  dbManager.getInstance().sellPlayer("player2","user1",200);
 }
 main();
