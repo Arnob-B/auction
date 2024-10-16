@@ -30,8 +30,9 @@ async function main() {
         if (player.getInstance().getPlayerId() === playerId) {
           if (bidAmnt === player.getInstance().nextPrice) {
             if (!userManager.getInstance().isBanned(bidderId)) {
-              const user = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === bidderId);
+              const user = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === bidderId );
               if(user){
+                if(bidderId === player.getInstance().currentWinningBidder) {redisManager.getInstance().publish(res.clientId,"you are the current winning bidder");break;}
                 if(user.getDetails().balance < bidAmnt) redisManager.getInstance().publish(res.clientId,"you dont have sufficient money");
                 else {
                   player.getInstance().currentWinningBidder = bidderId;
