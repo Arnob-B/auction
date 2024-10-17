@@ -19,7 +19,7 @@ export default class userManager{
   public delUser(id:string){
     this.allUsers.delete(id);
   }
-  public emitMsg(msg:engineMessage){
+  public emitMsg(msg:string){
     this.allUsers.forEach(e=>e.sendMsg(msg));
   }
   public getRandom():string{

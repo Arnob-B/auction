@@ -20,8 +20,8 @@ export type placeBidBody = {
   bidderId: string,
   bidAmnt: number
 }
-export const control = "CONTROL";
-export type controlBody = {
+export const setControl = "CONTROL";
+export type setControlBody = {
   state: "START"|"STOP"
 }
 
@@ -59,8 +59,8 @@ export type messagesFromApiType = {
   body?:string,
   clientId:string,
 }|{
-  type:typeof control,
-  body:controlBody,
+  type:typeof setControl,
+  body:setControlBody,
   clientId:string
 }|{
   type:typeof changeNextPrice,

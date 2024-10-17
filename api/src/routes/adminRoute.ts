@@ -2,7 +2,7 @@ import { addPlayer, addUser, banUser, banUserBody, messagesFromApiType, sellPlay
 import redisManager from "../redisManager";
 import { Router } from "express";
 import { changeNextPrice } from "../types/streamType";
-import { control } from "../types/streamType";
+import { setControl } from "../types/streamType";
 const route=Router();
 route.post('/addPlayer',async(req,res)=>{
   const {id,name,basePrice} = req.body;
@@ -73,7 +73,7 @@ route.post("/changeNextPrice",async(req,res)=>{
 route.post("/controls",async(req,res)=>{
   if(req.body.state === "START" || req.body.state === "STOP") {
     const response = await redisManager.getInstance().sendAndAwait({
-      type: control,
+      type: setControl,
       body: {
         state: req.body.state
       },

@@ -4,6 +4,7 @@ import { messagesFromApiType } from "../types/streamType";
 import player from "./playerManager";
 import { engineManager } from "./engineManager";
 import { userManager } from "./userManager";
+import { wsPublishMsg } from "../types/wsPSubStreamTypes";
 export default class redisManager{
   private client:RedisClientType; // takes from queue
   private publisher:RedisClientType; // publishes to the sub and also the userPubsub
@@ -45,8 +46,8 @@ export default class redisManager{
   public async publish(uid:string,msg:string){
     await this.publisher.publish(uid,msg);
   }
-  public async publishToWs(response: string) {
-    await this.publisher.publish("WSMESSAGE",response)
+  public async publishToWs(response: wsPublishMsg) {
+    await this.publisher.publish("WSMESSAGE",JSON.stringify(response))
   }
   public async pushToDBQueue(msgType:string){
     let msg = {};

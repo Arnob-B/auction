@@ -1,4 +1,5 @@
-import { addPlayer, addPlayerBody, banUser, changeNextPrice, changeNextPriceBody, control, getCurrentPlayer, messagesFromApiType, placeBid, placeBidBody, sellPlayer } from "../types/streamType";
+import { addPlayer, addPlayerBody, banUser, changeNextPrice, changeNextPriceBody,  getCurrentPlayer, messagesFromApiType, placeBid, placeBidBody, sellPlayer, setControl } from "../types/streamType";
+import { bidPlaced, getControl, newBidPrice, newPlayerListed, playerSold, userBanned } from "../types/wsPSubStreamTypes";
 import player from "./playerManager";
 import redisManager from "./redisManager";
 import { userManager } from "./userManager";
@@ -94,7 +95,7 @@ export class engineManager{
           this.publishToApi(msg.clientId, responseToApi);
           break;
         }
-      case control:
+      case setControl:
         {
           const responseToApi = await this.controls(msg.body);
           this.publishToApi(msg.clientId, responseToApi);
@@ -121,8 +122,8 @@ export class engineManager{
     const msg = player.getInstance().setPlayer(body);
     if (msg !== "playerAlreadyInBid") {
       const obj = player.getInstance();
-      const response = {
-        type: "NEWPLAYERLISTED",
+      const response:newPlayerListed = {
+        type: "NEW_PLAYER_LISTED",
         body: {
           playerId: obj.id,
           playerName: obj.name,
@@ -131,7 +132,7 @@ export class engineManager{
         }
       }
       //publish to ws pub sub
-      await redisManager.getInstance().publishToWs(JSON.stringify(response));
+      await redisManager.getInstance().publishToWs(response);
       //db call
     }
     return msg;
@@ -151,7 +152,7 @@ export class engineManager{
               // updating the player 
               player.getInstance().currentPrice = bidAmnt;
               player.getInstance().nextPrice = player.getInstance().currentPrice + player.getInstance().incrementPrice;
-              const response = {
+              const response:bidPlaced = {
                 type:"BID_PLACED",
                 body:{
                   palyerId:player.getInstance().id,
@@ -162,7 +163,7 @@ export class engineManager{
                 }
               }
               //publish to ws pub sub
-              await redisManager.getInstance().publishToWs(JSON.stringify(response));
+              await redisManager.getInstance().publishToWs(response);
               // db queue push
               return "bid placed";
             }
@@ -175,7 +176,7 @@ export class engineManager{
     const playerObj = player.getInstance();
     playerObj.incrementPrice = body.incrementPrice;
     playerObj.nextPrice = playerObj.currentPrice + playerObj.incrementPrice;
-    const response = {
+    const response:newBidPrice = {
       type:"NEW_BID_PRICE",
       body:{
         playerId:player.getInstance().id,
@@ -183,7 +184,7 @@ export class engineManager{
       }
     }
     // publishing to ws pubsub 
-    await redisManager.getInstance().publishToWs(JSON.stringify(response));
+    await redisManager.getInstance().publishToWs(response);
     return "new price set " + playerObj.nextPrice;
   }
   public async sellPlayer(){
@@ -195,7 +196,7 @@ export class engineManager{
       const ind = userManager.getInstance().allUsers.findIndex(e=> e.getDetails().userId === winnerId);
       let bal = userManager.getInstance().allUsers[ind].getDetails().balance;
       userManager.getInstance().allUsers[ind].setBalance(bal - player.getInstance().currentPrice);
-      const response = {
+      const response:playerSold = {
         type:"PLAYER_SOLD",
         playerId:player.getInstance().id,
         bidderId:userManager.getInstance().allUsers[ind].getDetails().userId,
@@ -203,7 +204,7 @@ export class engineManager{
         amount:player.getInstance().currentPrice
       }
       //publish to ws pub sub
-      await redisManager.getInstance().publishToWs(JSON.stringify(response));
+      await redisManager.getInstance().publishToWs(response);
       //db call to update player profile
     }
     return "playerSold";
@@ -212,14 +213,16 @@ export class engineManager{
     const msg = userManager.getInstance().banUser(body.userId);
     if(msg !== "userAlreadyInBanList"){
       const obj = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === body.userId);
-      const response = {
-        type:"USER_BANNED",
-        userId: obj?.getDetails().userName,
-        userName: obj?.getDetails().userName,
+      if (obj) {
+        const response: userBanned = {
+          type: "USER_BANNED",
+          userId: obj.getDetails().userName,
+          userName: obj.getDetails().userName,
+        }
+        //dbcall
+        //publish to ws
+        await redisManager.getInstance().publishToWs(response);
       }
-      //dbcall
-      //publish to ws
-      await redisManager.getInstance().publishToWs(JSON.stringify(response));
     }
     return msg;
   }
@@ -235,12 +238,12 @@ export class engineManager{
       this.bidContinue = false;
       msg = "bidding stopped";
     }
-    const response = {
+    const response:getControl = {
       type: "CONTROL",
-      state: body.state
+      state: body.state === "START"? "START":"STOP"
     }
     //publish to ws
-    await redisManager.getInstance().publishToWs(JSON.stringify(response));
+    await redisManager.getInstance().publishToWs(response);
     return msg;
   }
 }
