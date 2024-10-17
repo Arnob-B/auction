@@ -8,6 +8,7 @@ export default class subscriberManager{
   private constructor(){
     console.log("subcriberManager started");
     this.subscriber = createClient();
+    this.subscriber.connect();
     this.init();
   }
   private async init(){
@@ -26,18 +27,15 @@ export default class subscriberManager{
     this.subscriber.subscribe("WSMESSAGE",this.callbackFunc);
   }
   public async callbackFunc(message:string){
+    console.log("msgRecieved");
     const msg:wsPublishMsg = JSON.parse(message);
     switch(msg.type){
       case newPlayerListedType:{
-        const {playerId, ...sanitizedBody}= msg.body
-        await userManager.getInstance().emitMsg(JSON.stringify({
-          type:newPlayerListedType,
-          body:sanitizedBody
-        }));
+        await userManager.getInstance().emitMsg(JSON.stringify(msg));
         break;
       }
       case bidPlacedType:{
-        const {playerId, ...sanitizedBody} = msg.body;
+        const {bidderId, ...sanitizedBody} = msg.body;
         await userManager.getInstance().emitMsg(JSON.stringify({
           type:bidPlacedType,
           body:sanitizedBody
@@ -49,7 +47,7 @@ export default class subscriberManager{
         break;
       }
       case playerSoldType:{
-        const {playerId, ...sanitizedBody}= msg.body;
+        const {bidderId, ...sanitizedBody}= msg.body;
         await userManager.getInstance().emitMsg(JSON.stringify({
           type:playerSoldType,
           body:sanitizedBody
