@@ -183,7 +183,7 @@ export class engineManager{
     }
     // publishing to ws pubsub 
     await redisManager.getInstance().publishToWs(JSON.stringify(response));
-    return "new price set" + playerObj.nextPrice;
+    return "new price set " + playerObj.nextPrice;
   }
   public async sellPlayer(){
     const winnerId = player.getInstance().currentWinningBidder;
