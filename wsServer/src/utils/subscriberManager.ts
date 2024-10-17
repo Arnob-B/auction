@@ -20,15 +20,17 @@ export default class subscriberManager{
       return this.instance = new subscriberManager();
     }
   }
-  public run(){
+  public async run(){
+    await this.subscriber;
+    console.log("waiting to recieve msgs");
     this.subscriber.subscribe("WSMESSAGE",this.callbackFunc);
   }
-  public callbackFunc(message:string){
+  public async callbackFunc(message:string){
     const msg:wsPublishMsg = JSON.parse(message);
     switch(msg.type){
       case newPlayerListedType:{
         const {playerId, ...sanitizedBody}= msg.body
-        userManager.getInstance().emitMsg(JSON.stringify({
+        await userManager.getInstance().emitMsg(JSON.stringify({
           type:newPlayerListedType,
           body:sanitizedBody
         }));
@@ -36,19 +38,19 @@ export default class subscriberManager{
       }
       case bidPlacedType:{
         const {playerId, ...sanitizedBody} = msg.body;
-        userManager.getInstance().emitMsg(JSON.stringify({
+        await userManager.getInstance().emitMsg(JSON.stringify({
           type:bidPlacedType,
           body:sanitizedBody
         }));
         break;
       }
       case newBidPriceType:{
-        userManager.getInstance().emitMsg(JSON.stringify(msg));
+        await userManager.getInstance().emitMsg(JSON.stringify(msg));
         break;
       }
       case playerSoldType:{
         const {playerId, ...sanitizedBody}= msg.body;
-        userManager.getInstance().emitMsg(JSON.stringify({
+        await userManager.getInstance().emitMsg(JSON.stringify({
           type:playerSoldType,
           body:sanitizedBody
         }));
@@ -56,14 +58,14 @@ export default class subscriberManager{
       }
       case userBannedType:{
         const {userId, ...sanitizedBody}= msg.body;
-        userManager.getInstance().emitMsg(JSON.stringify({
+        await userManager.getInstance().emitMsg(JSON.stringify({
           type:userBannedType,
           body:sanitizedBody
         }));
         break;
       }
       case getControlType:{
-        userManager.getInstance().emitMsg(JSON.stringify(msg));
+        await userManager.getInstance().emitMsg(JSON.stringify(msg));
         break;
       }
     }
