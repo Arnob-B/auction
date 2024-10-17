@@ -20,6 +20,10 @@ export class engineManager{
     if(this.instance) return this.instance;
     return this.instance = new engineManager();
   }
+  public async runEngine(){
+    while(true){
+    }
+  }
   public async descisionMaker(msg:messagesFromApiType){
     let response = "";
     switch(msg.type){
@@ -36,6 +40,7 @@ export class engineManager{
         }
       case placeBid:
         {
+          if(!this.bidContinue) {redisManager.getInstance().publish(msg.clientId,"Biddin is paused for now");break;}
           const response = await this.placeBid(msg.body);
           break;
         }
