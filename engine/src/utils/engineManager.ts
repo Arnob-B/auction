@@ -1,8 +1,9 @@
 import { addPlayer, addPlayerBody, banUser, changeNextPrice, changeNextPriceBody, control, getCurrentPlayer, messagesFromApiType, placeBid, placeBidBody, sellPlayer } from "../types/streamType";
 import player from "./playerManager";
 import redisManager from "./redisManager";
-import { userManager } from "./userManager";
+import { user, userManager } from "./userManager";
 import wsManager from "./wsManager";
+import userSeed from "./userSeed";
 
 export class engineManager{
   private static instance:engineManager;
@@ -11,17 +12,51 @@ export class engineManager{
     redisManager.getInstance();
     userManager.getInstance();
     player.getInstance();
+    this.init()
     this.bidContinue = true;
   }
-  public async publishToApi(clientId:string,msg:string){
-    await redisManager.getInstance().publish(clientId,msg);
+  private async init(){
+    await this.addAllUser();
+  }
+  private async addAllUser(){
+    userManager.getInstance().allUsers = [];
+    userManager.getInstance().bannedUser = [];
+    console.log("user addition started");
+    console.log("db call made");
+    // db call to get all the users from db;
+    // db call to get all the users from db;
+    console.log("users succesfully fetched from db");
+    let count = userSeed.length;
+    count/=10;
+    count =Math.floor(count);
+    process.stdout.write(`<`);
+    for(let a=0;a<userSeed.length;a++){
+      await new Promise((res)=>{
+        setTimeout(()=>{
+          userManager.getInstance().addUser(userSeed[a].id, userSeed[a].name, userSeed[a].balance);
+          res('');
+        },20)
+      })
+      if(a%count==0)process.stdout.write(`=`);
+    }
+    process.stdout.write(`>\n`);
+    console.log("users added sucessfully");
   }
   public static getInstance(){
     if(this.instance) return this.instance;
     return this.instance = new engineManager();
   }
+  public async publishToApi(clientId:string,msg:string){
+    await redisManager.getInstance().publish(clientId,msg);
+  }
   public async runEngine(){
     while(true){
+      let msg = await redisManager.getInstance().pullQueue();
+      if(msg){
+        console.log(msg.type);
+        await this.descisionMaker(msg);
+        console.log("resolved");
+      }
     }
   }
   public async descisionMaker(msg:messagesFromApiType){
@@ -51,17 +86,17 @@ export class engineManager{
         }
       case sellPlayer:
         {
-          const response = await this.sellPlayer();
+          const response:any = await this.sellPlayer();
           break;
         }
       case control:
         {
-          const response = await this.controls(msg.body);
+          const response:any = await this.controls(msg.body);
           break;
         }
       case changeNextPrice:
         {
-          const response =  this.changeNextPrice(msg.body);
+          const response:any =  this.changeNextPrice(msg.body);
           break;
         }
     }

@@ -50,7 +50,7 @@ async function main() {
         redisManager.getInstance().publish(res.clientId,msg);
         break;
       case sellPlayer:
-        msg = player.getInstance().sellPlayer();
+        msg = await player.getInstance().sellPlayer();
         redisManager.getInstance().publish(res.clientId,msg);
         break;
       case getCurrentPlayer:
