@@ -7,3 +7,7 @@ export type storePlayerBid = {
   playerId: String,
   bidId: String,
 }
+export type playerSold = {
+  type : msgtype.playerSold,
+  bidId:string,
+}
