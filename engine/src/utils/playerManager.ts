@@ -18,7 +18,7 @@ export default class player{
     this.basePrice = 0;
     this.currentPrice = 0;
     this.incrementPrice = 20;
-    this.nextPrice = this.currentPrice+ this.incrementPrice;
+    this.nextPrice = 0;
   }
   public static getInstance(){
     if(this.instance){
