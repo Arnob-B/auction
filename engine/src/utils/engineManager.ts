@@ -71,32 +71,38 @@ export class engineManager{
       case addPlayer:
         {
           const response = await this.listPlayer(msg.body);
+          this.publishToApi(msg.clientId, response);
           break;
         }
       case placeBid:
         {
           if(!this.bidContinue) {redisManager.getInstance().publish(msg.clientId,"Biddin is paused for now");break;}
           const response = await this.placeBid(msg.body);
+          this.publishToApi(msg.clientId, response);
           break;
         }
       case banUser:
         {
           const response = await this.banUser(msg.body);
+          this.publishToApi(msg.clientId, response);
           break;
         }
       case sellPlayer:
         {
-          const response:any = await this.sellPlayer();
+          const response = await this.sellPlayer();
+          this.publishToApi(msg.clientId, response);
           break;
         }
       case control:
         {
-          const response:any = await this.controls(msg.body);
+          const response = await this.controls(msg.body);
+          this.publishToApi(msg.clientId, response);
           break;
         }
       case changeNextPrice:
         {
-          const response:any =  this.changeNextPrice(msg.body);
+          const response = await this.changeNextPrice(msg.body);
+          this.publishToApi(msg.clientId, response);
           break;
         }
     }
@@ -138,7 +144,12 @@ export class engineManager{
       } else return "price is not upto the bid mark";
     } else return "you chose wrong player";
   }
-  public changeNextPrice(body:changeNextPriceBody){
+  public async changeNextPrice(body:changeNextPriceBody){
+    const playerObj = player.getInstance();
+    playerObj.incrementPrice = body.incrementPrice;
+    playerObj.nextPrice = playerObj.currentPrice + playerObj.incrementPrice;
+    // publishing
+    return "new price set" + playerObj.nextPrice;
   }
   public async sellPlayer(){
     const winnerId = player.getInstance().currentWinningBidder;
@@ -176,5 +187,6 @@ export class engineManager{
         state:body.state
       }
     ));
+    return msg;
   }
 }
