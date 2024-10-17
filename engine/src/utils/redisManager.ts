@@ -45,74 +45,8 @@ export default class redisManager{
   public async publish(uid:string,msg:string){
     await this.publisher.publish(uid,msg);
   }
-  public async publishToWs(type: string) {
-    switch (type) {
-      case "NEWBIDPRICE":
-        {
-          await this.publisher.publish("WSMESSAGE", JSON.stringify({
-            type: "NEWBIDPRICE",
-            body: {
-              playerId: player.getInstance().id,
-              nextPrice: player.getInstance().nextPrice
-            }
-          })); break;
-        }
-      case "NEWPLAYERLISTED":
-        {
-          await this.publisher.publish("WSMESSAGE", JSON.stringify({
-            type: "NEWBIDPRICE",
-            body: {
-              playerId: player.getInstance().id,
-              nextPrice: player.getInstance().nextPrice
-            }
-          }));
-        }
-      case "BIDPLACED":
-        {
-          await this.publisher.publish("WSMESSAGE", JSON.stringify({
-            type: "NEWBIDPRICE",
-            body: {
-              playerId: player.getInstance().id,
-              nextPrice: player.getInstance().nextPrice
-            }
-          })); break;
-        }
-      case "USERBANNED":
-        {
-          await this.publisher.publish("WSMESSAGE", JSON.stringify({
-            type: "NEWBIDPRICE",
-            body: {
-              playerId: player.getInstance().id,
-              nextPrice: player.getInstance().nextPrice
-            }
-          })); break;
-        }
-      case "PLAYERSOLD": {
-        const bidderId = player.getInstance().currentWinningBidder;
-        let winningBidderName:string = "";
-        const ind = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === bidderId);
-        if(ind){
-          winningBidderName =ind.getDetails().userName;
-        }
-        await this.publisher.publish("WSMESSAGE", JSON.stringify({
-          type: "NEWBIDPRICE",
-          body: {
-            playerId: player.getInstance().id,
-            bidderId: bidderId,
-            bidderName : winningBidderName,
-            amount:player.getInstance().currentPrice
-          }
-        }));break;
-      }
-      case "CONTROLS": {
-        await this.publisher.publish("WSMESSAGE", JSON.stringify({
-          type: "CONTROLS",
-          body: {
-            status :engineManager.getInstance().getStatus()
-          }
-        }));break;
-      }
-    }
+  public async publishToWs(response: string) {
+    await this.publisher.publish("WSMESSAGE",response)
   }
   public async pushToDBQueue(msgType:string){
     let msg = {};

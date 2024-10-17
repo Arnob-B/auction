@@ -1,8 +1,7 @@
 import { addPlayer, addPlayerBody, banUser, changeNextPrice, changeNextPriceBody, control, getCurrentPlayer, messagesFromApiType, placeBid, placeBidBody, sellPlayer } from "../types/streamType";
 import player from "./playerManager";
 import redisManager from "./redisManager";
-import { user, userManager } from "./userManager";
-import wsManager from "./wsManager";
+import { userManager } from "./userManager";
 import userSeed from "./userSeed";
 
 export class engineManager{
@@ -129,7 +128,8 @@ export class engineManager{
         currentPrice:obj.nextPrice,
       }
     }
-    //publish
+    //publish to ws pub sub
+    await redisManager.getInstance().publishToWs(JSON.stringify(response));
     //db call
     return msg;
   }
@@ -147,8 +147,6 @@ export class engineManager{
               // updating the player 
               player.getInstance().currentPrice = bidAmnt;
               player.getInstance().nextPrice = player.getInstance().currentPrice + player.getInstance().incrementPrice;
-              //publish to ws
-              // db queue push
               const response = {
                 type:"BID_PLACED",
                 body:{
@@ -159,6 +157,9 @@ export class engineManager{
                   nextPrice:player.getInstance().nextPrice
                 }
               }
+              //publish to ws pub sub
+              await redisManager.getInstance().publishToWs(JSON.stringify(response));
+              // db queue push
               return "bid placed";
             }
           } else return "you are not registered for the auction";
@@ -177,7 +178,8 @@ export class engineManager{
         nextPrice:player.getInstance().nextPrice
       }
     }
-    // publishing
+    // publishing to ws pubsub 
+    await redisManager.getInstance().publishToWs(JSON.stringify(response));
     return "new price set" + playerObj.nextPrice;
   }
   public async sellPlayer(){
@@ -195,6 +197,8 @@ export class engineManager{
         bidderName:userManager.getInstance().allUsers[ind].getDetails().userName,
         amount:player.getInstance().currentPrice
       }
+      //publish to ws pub sub
+      await redisManager.getInstance().publishToWs(JSON.stringify(response));
       //db call to update player profile
     }
     return "playerSold";
@@ -208,7 +212,8 @@ export class engineManager{
         userName: obj?.getDetails().userName,
       }
       //dbcall
-      //publish
+      //publish to ws
+      await redisManager.getInstance().publishToWs(JSON.stringify(response));
     }
     return msg;
   }
@@ -228,6 +233,8 @@ export class engineManager{
       type: "CONTROL",
       state: body.state
     }
+    //publish to ws
+    await redisManager.getInstance().publishToWs(JSON.stringify(response));
     return msg;
   }
 }
