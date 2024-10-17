@@ -27,7 +27,7 @@ export default class player{
     return this.instance = new player();
   }
   public setPlayer(stats:playerStat):string{
-    if(this.id === stats.playerId) return "player already in bid"
+    if(this.id === stats.playerId) return "playerAlreadyInBid"
     this.id = stats.playerId;
     this.name = stats.playerName;
     this.basePrice = stats.playerBasePrice;

@@ -15,7 +15,9 @@ export class engineManager{
     this.bidContinue = true;
   }
   private async init(){
+    await redisManager.getInstance();
     await this.addAllUser();
+    this.runEngine();
   }
   public static getInstance(){
     if(this.instance) return this.instance;
@@ -60,49 +62,48 @@ export class engineManager{
     }
   }
   public async descisionMaker(msg:messagesFromApiType){
-    let response = "";
     switch(msg.type){
       case getCurrentPlayer:
         {
-          const response = this.getCurrentPlayer();
-          this.publishToApi(msg.clientId, response);
+          const responseToApi = this.getCurrentPlayer();
+          await this.publishToApi(msg.clientId, responseToApi);
           break;
         }
       case addPlayer:
         {
-          const response = await this.listPlayer(msg.body);
-          this.publishToApi(msg.clientId, response);
+          const responseToApi = await this.listPlayer(msg.body);
+          await this.publishToApi(msg.clientId, responseToApi);
           break;
         }
       case placeBid:
         {
           if(!this.bidContinue) {redisManager.getInstance().publish(msg.clientId,"Biddin is paused for now");break;}
-          const response = await this.placeBid(msg.body);
-          this.publishToApi(msg.clientId, response);
+          const responseToApi = await this.placeBid(msg.body);
+          this.publishToApi(msg.clientId, responseToApi);
           break;
         }
       case banUser:
         {
-          const response = await this.banUser(msg.body);
-          this.publishToApi(msg.clientId, response);
+          const responseToApi = await this.banUser(msg.body);
+          this.publishToApi(msg.clientId, responseToApi);
           break;
         }
       case sellPlayer:
         {
-          const response = await this.sellPlayer();
-          this.publishToApi(msg.clientId, response);
+          const responseToApi = await this.sellPlayer();
+          this.publishToApi(msg.clientId, responseToApi);
           break;
         }
       case control:
         {
-          const response = await this.controls(msg.body);
-          this.publishToApi(msg.clientId, response);
+          const responseToApi = await this.controls(msg.body);
+          this.publishToApi(msg.clientId, responseToApi);
           break;
         }
       case changeNextPrice:
         {
-          const response = await this.changeNextPrice(msg.body);
-          this.publishToApi(msg.clientId, response);
+          const responseToApi = await this.changeNextPrice(msg.body);
+          this.publishToApi(msg.clientId, responseToApi);
           break;
         }
     }
@@ -118,19 +119,21 @@ export class engineManager{
   }
   public async listPlayer(body:addPlayerBody):Promise<string>{
     const msg = player.getInstance().setPlayer(body);
-    const obj = player.getInstance();
-    const response = {
-      type: "NEWPLAYERLISTED",
-      body:{
-        playerId:obj.id,
-        playerName:obj.name,
-        basePrice:obj.basePrice,
-        currentPrice:obj.nextPrice,
+    if (msg !== "playerAlreadyInBid") {
+      const obj = player.getInstance();
+      const response = {
+        type: "NEWPLAYERLISTED",
+        body: {
+          playerId: obj.id,
+          playerName: obj.name,
+          basePrice: obj.basePrice,
+          currentPrice: obj.nextPrice,
+        }
       }
+      //publish to ws pub sub
+      await redisManager.getInstance().publishToWs(JSON.stringify(response));
+      //db call
     }
-    //publish to ws pub sub
-    await redisManager.getInstance().publishToWs(JSON.stringify(response));
-    //db call
     return msg;
   }
   public async placeBid(body:placeBidBody):Promise<string>{
@@ -192,6 +195,7 @@ export class engineManager{
       let bal = userManager.getInstance().allUsers[ind].getDetails().balance;
       userManager.getInstance().allUsers[ind].setBalance(bal - player.getInstance().currentPrice);
       const response = {
+        type:"PLAYER_SOLD",
         playerId:player.getInstance().id,
         bidderId:userManager.getInstance().allUsers[ind].getDetails().userId,
         bidderName:userManager.getInstance().allUsers[ind].getDetails().userName,
@@ -208,6 +212,7 @@ export class engineManager{
     if(msg !== "userAlreadyInBanList"){
       const obj = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === body.userId);
       const response = {
+        type:"USER_BANNED",
         userId: obj?.getDetails().userName,
         userName: obj?.getDetails().userName,
       }
