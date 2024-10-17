@@ -46,9 +46,9 @@ export class userManager{
     if(!this.bannedUser.find(e=> e===userId))
     {
       this.bannedUser.push(userId);
-      return "user banned"
+      return "userBanned"
     }
-    return "user already in ban list"
+    return "userAlreadyInBanList"
   }
   public isBanned(id:string):boolean{
     return this.bannedUser.find(e=> e===id) ? true:false;

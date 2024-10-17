@@ -2,6 +2,8 @@ import { RedisClientType, createClient } from "redis";
 import { inputType } from "../types/in";
 import { messagesFromApiType } from "../types/streamType";
 import player from "./playerManager";
+import { engineManager } from "./engineManager";
+import { userManager } from "./userManager";
 export default class redisManager{
   private client:RedisClientType; // takes from queue
   private publisher:RedisClientType; // publishes to the sub and also the userPubsub
@@ -42,6 +44,75 @@ export default class redisManager{
   }
   public async publish(uid:string,msg:string){
     await this.publisher.publish(uid,msg);
+  }
+  public async publishToWs(type: string) {
+    switch (type) {
+      case "NEWBIDPRICE":
+        {
+          await this.publisher.publish("WSMESSAGE", JSON.stringify({
+            type: "NEWBIDPRICE",
+            body: {
+              playerId: player.getInstance().id,
+              nextPrice: player.getInstance().nextPrice
+            }
+          })); break;
+        }
+      case "NEWPLAYERLISTED":
+        {
+          await this.publisher.publish("WSMESSAGE", JSON.stringify({
+            type: "NEWBIDPRICE",
+            body: {
+              playerId: player.getInstance().id,
+              nextPrice: player.getInstance().nextPrice
+            }
+          }));
+        }
+      case "BIDPLACED":
+        {
+          await this.publisher.publish("WSMESSAGE", JSON.stringify({
+            type: "NEWBIDPRICE",
+            body: {
+              playerId: player.getInstance().id,
+              nextPrice: player.getInstance().nextPrice
+            }
+          })); break;
+        }
+      case "USERBANNED":
+        {
+          await this.publisher.publish("WSMESSAGE", JSON.stringify({
+            type: "NEWBIDPRICE",
+            body: {
+              playerId: player.getInstance().id,
+              nextPrice: player.getInstance().nextPrice
+            }
+          })); break;
+        }
+      case "PLAYERSOLD": {
+        const bidderId = player.getInstance().currentWinningBidder;
+        let winningBidderName:string = "";
+        const ind = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === bidderId);
+        if(ind){
+          winningBidderName =ind.getDetails().userName;
+        }
+        await this.publisher.publish("WSMESSAGE", JSON.stringify({
+          type: "NEWBIDPRICE",
+          body: {
+            playerId: player.getInstance().id,
+            bidderId: bidderId,
+            bidderName : winningBidderName,
+            amount:player.getInstance().currentPrice
+          }
+        }));break;
+      }
+      case "CONTROLS": {
+        await this.publisher.publish("WSMESSAGE", JSON.stringify({
+          type: "CONTROLS",
+          body: {
+            status :engineManager.getInstance().getStatus()
+          }
+        }));break;
+      }
+    }
   }
   public async pushToDBQueue(msgType:string){
     let msg = {};

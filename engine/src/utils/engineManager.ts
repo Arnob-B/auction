@@ -18,6 +18,11 @@ export class engineManager{
   private async init(){
     await this.addAllUser();
   }
+  public static getInstance(){
+    if(this.instance) return this.instance;
+    return this.instance = new engineManager();
+  }
+  public getStatus(){return this.bidContinue?"START":"STOP";}
   private async addAllUser(){
     userManager.getInstance().allUsers = [];
     userManager.getInstance().bannedUser = [];
@@ -41,10 +46,6 @@ export class engineManager{
     }
     process.stdout.write(`>\n`);
     console.log("users added sucessfully");
-  }
-  public static getInstance(){
-    if(this.instance) return this.instance;
-    return this.instance = new engineManager();
   }
   public async publishToApi(clientId:string,msg:string){
     await redisManager.getInstance().publish(clientId,msg);
@@ -118,6 +119,17 @@ export class engineManager{
   }
   public async listPlayer(body:addPlayerBody):Promise<string>{
     const msg = player.getInstance().setPlayer(body);
+    const obj = player.getInstance();
+    const response = {
+      type: "NEWPLAYERLISTED",
+      body:{
+        playerId:obj.id,
+        playerName:obj.name,
+        basePrice:obj.basePrice,
+        currentPrice:obj.nextPrice,
+      }
+    }
+    //publish
     //db call
     return msg;
   }
@@ -135,8 +147,18 @@ export class engineManager{
               // updating the player 
               player.getInstance().currentPrice = bidAmnt;
               player.getInstance().nextPrice = player.getInstance().currentPrice + player.getInstance().incrementPrice;
+              //publish to ws
               // db queue push
-              wsManager.getInstance().bidPlaced();
+              const response = {
+                type:"BID_PLACED",
+                body:{
+                  palyerId:player.getInstance().id,
+                  bidderId:user.getDetails().userId,
+                  bidderName:user.getDetails().userName,
+                  amount:player.getInstance().currentPrice,
+                  nextPrice:player.getInstance().nextPrice
+                }
+              }
               return "bid placed";
             }
           } else return "you are not registered for the auction";
@@ -148,6 +170,13 @@ export class engineManager{
     const playerObj = player.getInstance();
     playerObj.incrementPrice = body.incrementPrice;
     playerObj.nextPrice = playerObj.currentPrice + playerObj.incrementPrice;
+    const response = {
+      type:"NEW_BID_PRICE",
+      body:{
+        playerId:player.getInstance().id,
+        nextPrice:player.getInstance().nextPrice
+      }
+    }
     // publishing
     return "new price set" + playerObj.nextPrice;
   }
@@ -160,13 +189,27 @@ export class engineManager{
       const ind = userManager.getInstance().allUsers.findIndex(e=> e.getDetails().userId === winnerId);
       let bal = userManager.getInstance().allUsers[ind].getDetails().balance;
       userManager.getInstance().allUsers[ind].setBalance(bal - player.getInstance().currentPrice);
+      const response = {
+        playerId:player.getInstance().id,
+        bidderId:userManager.getInstance().allUsers[ind].getDetails().userId,
+        bidderName:userManager.getInstance().allUsers[ind].getDetails().userName,
+        amount:player.getInstance().currentPrice
+      }
       //db call to update player profile
     }
     return "playerSold";
   }
   public async banUser(body:{userId:string}){
     const msg = userManager.getInstance().banUser(body.userId);
-    //db call
+    if(msg !== "userAlreadyInBanList"){
+      const obj = userManager.getInstance().allUsers.find(e=>e.getDetails().userId === body.userId);
+      const response = {
+        userId: obj?.getDetails().userName,
+        userName: obj?.getDetails().userName,
+      }
+      //dbcall
+      //publish
+    }
     return msg;
   }
   public async controls(body:{state:string}){
@@ -181,12 +224,10 @@ export class engineManager{
       this.bidContinue = false;
       msg = "bidding stopped";
     }
-    redisManager.getInstance().publish('WsPubSub',JSON.stringify(
-      {
-        type: "CONTROL",
-        state:body.state
-      }
-    ));
+    const response = {
+      type: "CONTROL",
+      state: body.state
+    }
     return msg;
   }
 }
