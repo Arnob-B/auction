@@ -187,16 +187,25 @@ export class engineManager{
     await redisManager.getInstance().publishToWs(response);
     return "new price set " + playerObj.nextPrice;
   }
-  public async sellPlayer(){
+  public async sellPlayer() {
     const winnerId = player.getInstance().currentWinningBidder;
-    if( winnerId === ""){
-      //db call with player remaining unsold
+    let response: playerSold;
+    if (winnerId === "") {
+      response = {
+        type: "PLAYER_SOLD",
+        body: {
+          playerId: "",
+          bidderId: "",
+          bidderName: "No one",
+          amount: 0
+        }
+      }
     }
-    else{
-      const ind = userManager.getInstance().allUsers.findIndex(e=> e.getDetails().userId === winnerId);
+    else {
+      const ind = userManager.getInstance().allUsers.findIndex(e => e.getDetails().userId === winnerId);
       let bal = userManager.getInstance().allUsers[ind].getDetails().balance;
       userManager.getInstance().allUsers[ind].setBalance(bal - player.getInstance().currentPrice);
-      const response:playerSold = {
+      response = {
         type: "PLAYER_SOLD",
         body: {
           playerId: player.getInstance().id,
@@ -205,10 +214,16 @@ export class engineManager{
           amount: player.getInstance().currentPrice
         }
       }
-      //publish to ws pub sub
-      await redisManager.getInstance().publishToWs(response);
-      //db call to update player profile
     }
+    //seting up new player as ""
+    player.getInstance().setPlayer({
+      playerId: "",
+      playerName: "",
+      playerBasePrice: 0
+    });
+    //publish to ws pub sub
+    await redisManager.getInstance().publishToWs(response);
+    //db call with player remaining unsold
     return "playerSold";
   }
   public async banUser(body:{userId:string}){
