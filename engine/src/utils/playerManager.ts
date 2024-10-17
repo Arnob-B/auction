@@ -36,7 +36,7 @@ export default class player{
     this.nextPrice = this.basePrice;
     return "new player set";
   }
-  public sellPlayer(){
+  public async sellPlayer(){
     const winnerId = this.currentWinningBidder;
     if( winnerId === ""){
       //db call with player remaining unsold
