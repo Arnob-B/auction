@@ -24,7 +24,6 @@ app.get("/getCurrentPlayer",async (req, res)=>{
 })
 
 app.post('/bid',async(req,res)=>{
-  console.log(req.body);
   const {playerId, bidderId, amnt}= req.body;
   if(playerId !==undefined && bidderId !== undefined && amnt !== undefined)
   {
