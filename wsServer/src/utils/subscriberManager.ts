@@ -1,5 +1,6 @@
 import { createClient, RedisClientType } from "redis";
 import userManager from "./userManager";
+import { bidPlacedType, getControlType, newBidPriceType, newPlayerListedType, playerSoldType, userBannedType, wsPublishMsg } from "../types/wsPSubStreamTypes";
 
 export default class subscriberManager{
   private subscriber:RedisClientType;
@@ -23,6 +24,48 @@ export default class subscriberManager{
     this.subscriber.subscribe("WSMESSAGE",this.callbackFunc);
   }
   public callbackFunc(message:string){
-    userManager.getInstance().emitMsg(message);
+    const msg:wsPublishMsg = JSON.parse(message);
+    switch(msg.type){
+      case newPlayerListedType:{
+        const {playerId, ...sanitizedBody}= msg.body
+        userManager.getInstance().emitMsg(JSON.stringify({
+          type:newPlayerListedType,
+          body:sanitizedBody
+        }));
+        break;
+      }
+      case bidPlacedType:{
+        const {playerId, ...sanitizedBody} = msg.body;
+        userManager.getInstance().emitMsg(JSON.stringify({
+          type:bidPlacedType,
+          body:sanitizedBody
+        }));
+        break;
+      }
+      case newBidPriceType:{
+        userManager.getInstance().emitMsg(JSON.stringify(msg));
+        break;
+      }
+      case playerSoldType:{
+        const {playerId, ...sanitizedBody}= msg.body;
+        userManager.getInstance().emitMsg(JSON.stringify({
+          type:playerSoldType,
+          body:sanitizedBody
+        }));
+        break;
+      }
+      case userBannedType:{
+        const {userId, ...sanitizedBody}= msg.body;
+        userManager.getInstance().emitMsg(JSON.stringify({
+          type:userBannedType,
+          body:sanitizedBody
+        }));
+        break;
+      }
+      case getControlType:{
+        userManager.getInstance().emitMsg(JSON.stringify(msg));
+        break;
+      }
+    }
   }
 }

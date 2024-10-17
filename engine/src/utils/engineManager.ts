@@ -155,7 +155,7 @@ export class engineManager{
               const response:bidPlaced = {
                 type:"BID_PLACED",
                 body:{
-                  palyerId:player.getInstance().id,
+                  playerId:player.getInstance().id,
                   bidderId:user.getDetails().userId,
                   bidderName:user.getDetails().userName,
                   amount:player.getInstance().currentPrice,
@@ -197,11 +197,13 @@ export class engineManager{
       let bal = userManager.getInstance().allUsers[ind].getDetails().balance;
       userManager.getInstance().allUsers[ind].setBalance(bal - player.getInstance().currentPrice);
       const response:playerSold = {
-        type:"PLAYER_SOLD",
-        playerId:player.getInstance().id,
-        bidderId:userManager.getInstance().allUsers[ind].getDetails().userId,
-        bidderName:userManager.getInstance().allUsers[ind].getDetails().userName,
-        amount:player.getInstance().currentPrice
+        type: "PLAYER_SOLD",
+        body: {
+          playerId: player.getInstance().id,
+          bidderId: userManager.getInstance().allUsers[ind].getDetails().userId,
+          bidderName: userManager.getInstance().allUsers[ind].getDetails().userName,
+          amount: player.getInstance().currentPrice
+        }
       }
       //publish to ws pub sub
       await redisManager.getInstance().publishToWs(response);
@@ -216,8 +218,10 @@ export class engineManager{
       if (obj) {
         const response: userBanned = {
           type: "USER_BANNED",
-          userId: obj.getDetails().userName,
-          userName: obj.getDetails().userName,
+          body: {
+            userId: obj.getDetails().userName,
+            userName: obj.getDetails().userName,
+          }
         }
         //dbcall
         //publish to ws
@@ -240,7 +244,7 @@ export class engineManager{
     }
     const response:getControl = {
       type: "CONTROL",
-      state: body.state === "START"? "START":"STOP"
+      body:{state: body.state === "START"? "START":"STOP"}
     }
     //publish to ws
     await redisManager.getInstance().publishToWs(response);
