@@ -1,6 +1,8 @@
 import { addPlayer, addUser, banUser, banUserBody, messagesFromApiType, sellPlayer } from "../types/streamType";
 import redisManager from "../redisManager";
 import { Router } from "express";
+import { changeNextPrice } from "../types/streamType";
+import { control } from "../types/streamType";
 const route=Router();
 route.post('/addPlayer',async(req,res)=>{
   const {id,name,basePrice} = req.body;
@@ -55,5 +57,32 @@ route.post("/sellPlayer",async(req,res)=>{
   });
   res.json({msg:response});
 })
+
+route.post("/changeNextPrice",async(req,res)=>{
+  if(typeof(req.body.incrementPrice) === "number")
+  {
+    const response = await redisManager.getInstance().sendAndAwait({
+      type: changeNextPrice,
+      body: { incrementPrice: req.body.incrementPrice },
+      clientId: redisManager.getInstance().getRandom()
+    })
+    res.json({ msg: response });
+  }
+  else res.json({msg:"failed"});
+});
+route.post("/controls",async(req,res)=>{
+  if(req.body.state === "START" || req.body.state === "STOP") {
+    const response = await redisManager.getInstance().sendAndAwait({
+      type: control,
+      body: {
+        state: req.body.state
+      },
+      clientId: redisManager.getInstance().getRandom()
+    })
+    res.json({ msg: response });
+  }
+  else 
+    res.json({ msg: "failed" });
+});
 
 export default route;

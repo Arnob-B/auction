@@ -60,7 +60,7 @@ export type messagesFromApiType = {
   clientId:string,
 }|{
   type:typeof control,
-  body?:string,
+  body:controlBody,
   clientId:string
 }|{
   type:typeof changeNextPrice,
