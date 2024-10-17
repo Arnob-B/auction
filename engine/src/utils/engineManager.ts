@@ -140,7 +140,7 @@ export class engineManager{
   public async placeBid(body:placeBidBody):Promise<string>{
     if(!this.bidContinue) return "can't bid now as bidding is paused";
     const { playerId, bidderId, bidAmnt } = body;
-    if (player.getInstance().getPlayerId() === playerId) {
+    if ( playerId !== "" && player.getInstance().getPlayerId() === playerId) {
       if (bidAmnt === player.getInstance().nextPrice) {
         if (!userManager.getInstance().isBanned(bidderId)) {
           const user = userManager.getInstance().allUsers.find(e => e.getDetails().userId === bidderId);
