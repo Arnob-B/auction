@@ -1,9 +1,14 @@
 "use client"
 import { useState } from "react";
+const headerContent = {
+  'Content-Type': 'application/json',
+}
 const BanUser = ()=>{
   const [userId, setUserId] = useState("");
   const banUserHandler = async ()=>{
     await fetch('http://localhost:3000/admin/banUser',{
+      method:"POST",
+      headers:headerContent,
       body: JSON.stringify({
         userId: userId
       })
@@ -85,45 +90,58 @@ const AddPlayer=()=>{
 }
 
 const PriceControl = () => {
-  const [price,setPrice] = useState(0);
-  const priceChangeHandler = async ()=>{
-    const res = await fetch("http://localhost:3000/admin/changeNextPrice",{
-      body:JSON.stringify(
-        {incrementPrice:price}
-      )
-    })
-    console.log(res);
-  }
-  return <div>
-    <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
-      <div className="p-4">
-        <h2 className="text-xl font-bold text-white text-center">Change Bid Price</h2>
-        <form className="mt-4">
+  const [price, setPrice] = useState(0);
+
+
+  const priceChangeHandler = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/admin/changeNextPrice', {
+        method: 'POST',
+        headers: headerContent,
+        body: JSON.stringify({ incrementPrice: price }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await res.json(); // Handle the response data as needed
+      console.log(data);
+    } catch (error) {
+      console.error('Price change error:', error);
+    }
+  };
+
+  return (
+    <div>
+      <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
+        <div className="p-4">
+          <h2 className="text-xl font-bold text-white text-center">Change Bid Price</h2>
           <div className="mb-4">
-            <label for="incrementPrice" className="block text-white">Increment Price</label>
+            <label htmlFor="incrementPrice" className="block text-white">Increment Price</label>
             <input
               type="number"
               id="incrementPrice"
               className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500"
               placeholder="Enter Increment Price"
-              value={price}
-              onChange={e=>setPrice(parseInt(e.target.value))}
+              value={price === 0? "" :price }
+              onChange={e => setPrice(parseInt(e.target.value) || 0)} // Ensure default to 0 if NaN
               step={10}
               required
             />
           </div>
           <button
-            type="submit"
+            type="button" // Change type to "button"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
             onClick={priceChangeHandler}
           >
             Set Price
           </button>
-        </form>
+        </div>
       </div>
     </div>
-  </div >
-}
+  );
+};
 const BidProfile = () => {
   return (
     <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
@@ -134,7 +152,7 @@ const BidProfile = () => {
           <p className="text-white">Player Name: <span className="font-semibold">12345</span></p>
           <p className="text-white">Base Price: <span className="font-semibold text-green-400">$1,000,000</span></p>
           <p className="text-white">Current Price: <span className="font-semibold text-green-400">$1,200,000</span></p>
-          <p className="text-white">Increment Price: <span className="font-semibold text-green-400">$50,000</span></p>
+          <p className="text-white">Next Bid Price: <span className="font-semibold text-green-400">$50,000</span></p>
         </div>
       </div>
     </div>
@@ -142,11 +160,13 @@ const BidProfile = () => {
 }
 const BidControl = () => {
   const   onSellHandler = async ()=>{
-    const res = await fetch("http://localhost:3000/admin/sellPlayer");
+    const res = await fetch("http://localhost:3000/admin/sellPlayer",{method:"POST"});
     console.log(res);
   }
   const onStartHandler = async ()=>{
     const res = await fetch("http://localhost:3000/admin/controls",{
+      method:"POST",
+      headers:headerContent,
       body:JSON.stringify({
         state:"START"
       })
@@ -155,6 +175,8 @@ const BidControl = () => {
   }
   const onStopHandler = async () => {
     const res = await fetch("http://localhost:3000/admin/controls", {
+      method:"POST",
+      headers:headerContent,
       body: JSON.stringify({
         state: "STOP"
       })
