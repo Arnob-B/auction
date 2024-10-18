@@ -29,7 +29,6 @@ function Card({playerDetails}:{playerDetails:playerDetailsType}){
   )
 }
 function LeaderBoard({bidderList}:{bidderList:[string,number][]}){
-
   return(
     <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
       <div className="p-4 border-b border-gray-700">
