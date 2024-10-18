@@ -31,11 +31,13 @@ export default class subscriberManager{
     const msg:wsPublishMsg = JSON.parse(message);
     switch(msg.type){
       case newPlayerListedType:{
+        await userManager.getInstance().emitAdmin(JSON.stringify(msg));
         await userManager.getInstance().emitMsg(JSON.stringify(msg));
         break;
       }
       case bidPlacedType:{
         const {bidderId, ...sanitizedBody} = msg.body;
+        await userManager.getInstance().emitAdmin(JSON.stringify(msg));
         await userManager.getInstance().emitMsg(JSON.stringify({
           type:bidPlacedType,
           body:sanitizedBody
@@ -43,11 +45,13 @@ export default class subscriberManager{
         break;
       }
       case newBidPriceType:{
+        await userManager.getInstance().emitAdmin(JSON.stringify(msg));
         await userManager.getInstance().emitMsg(JSON.stringify(msg));
         break;
       }
       case playerSoldType:{
         const {bidderId, ...sanitizedBody}= msg.body;
+        await userManager.getInstance().emitAdmin(JSON.stringify(msg));
         await userManager.getInstance().emitMsg(JSON.stringify({
           type:playerSoldType,
           body:sanitizedBody
@@ -56,6 +60,7 @@ export default class subscriberManager{
       }
       case userBannedType:{
         const {userId, ...sanitizedBody}= msg.body;
+        await userManager.getInstance().emitAdmin(JSON.stringify(msg));
         await userManager.getInstance().emitMsg(JSON.stringify({
           type:userBannedType,
           body:sanitizedBody
@@ -63,6 +68,7 @@ export default class subscriberManager{
         break;
       }
       case getControlType:{
+        await userManager.getInstance().emitAdmin(JSON.stringify(msg));
         await userManager.getInstance().emitMsg(JSON.stringify(msg));
         break;
       }

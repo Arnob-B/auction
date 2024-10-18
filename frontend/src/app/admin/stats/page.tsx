@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import { bidPlacedType } from "../types/wsPSubStreamTypes";
 
 const LeaderBoard = ({ bidders }:{bidders:Array<{
-  // bidderId:string,
+  bidderId:string,
   bidderName:string,
   playerId:string,
   amount:number
@@ -14,7 +14,7 @@ const LeaderBoard = ({ bidders }:{bidders:Array<{
       <table className="min-w-full bg-gray-800">
         <thead>
           <tr>
-            {/* <th className="py-2 px-4 text-left text-gray-300">Bidder ID</th> */}
+            <th className="py-2 px-4 text-left text-gray-300">Bidder ID</th>
             <th className="py-2 px-4 text-left text-gray-300">Bidder Name</th>
             <th className="py-2 px-4 text-left text-gray-300">Player ID</th>
             <th className="py-2 px-4 text-left text-gray-300">Amount</th>
@@ -23,7 +23,7 @@ const LeaderBoard = ({ bidders }:{bidders:Array<{
         <tbody>
           {bidders.map((bidder) => (
             <tr key={bidder.bidderName} className="border-b border-gray-700">
-              {/* <td className="py-2 px-4 text-white">{bidder.bidderId}</td> */}
+              <td className="py-2 px-4 text-white">{bidder.bidderId}</td>
               <td className="py-2 px-4 text-white">{bidder.bidderName}</td>
               <td className="py-2 px-4 text-white">{bidder.playerId}</td>
               <td className="py-2 px-4 text-white">{bidder.amount}</td>
@@ -37,14 +37,14 @@ const LeaderBoard = ({ bidders }:{bidders:Array<{
 
 export default function Page(){
   const [bidderList, setBidderList] = useState<Array<{
-    // bidderId: string,
+    bidderId: string,
     bidderName: string,
     playerId: string,
     amount: number
   }>>([]);
 
   useEffect(()=>{
-    const wsClient = new WebSocket('ws://localhost:3002/');
+    const wsClient = new WebSocket('ws://localhost:3003/');
     wsClient.onmessage=message=>{
       try {
         const msg = message.data;
@@ -55,6 +55,7 @@ export default function Page(){
             return [
               ...prev,
               {
+                bidderId:body.bidderId,
                 playerId: body.playerId,
                 bidderName: body.bidderName,
                 amount: body.amount
