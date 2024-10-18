@@ -5,7 +5,7 @@ const BanPlayer = ()=>{
         <h2 className="text-xl font-bold text-white text-center">Ban User</h2>
         <form className="mt-4">
           <div className="mb-4">
-            <label for="userId" className="block text-white">User ID</label>
+            <label htmlFor="userId" className="block text-white">User ID</label>
             <input
               type="text"
               id="userId"
@@ -33,7 +33,7 @@ const AddPlayer=()=>{
     <h2 className="text-xl font-bold text-white text-center">Add Player</h2>
     <form className="mt-4">
       <div className="mb-4">
-        <label for="playerId" className="block text-white">Player ID</label>
+        <label htmlFor="playerId" className="block text-white">Player ID</label>
         <input 
           type="text" 
           id="playerId" 
@@ -43,7 +43,7 @@ const AddPlayer=()=>{
         />
       </div>
       <div className="mb-4">
-        <label for="incrementPrice" className="block text-white">Increment Price</label>
+        <label htmlFor="incrementPrice" className="block text-white">Increment Price</label>
         <input 
           type="number" 
           id="incrementPrice" 
