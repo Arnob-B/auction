@@ -24,7 +24,6 @@ export class engineManager{
     if(this.instance) return this.instance;
     return this.instance = new engineManager();
   }
-  public getStatus(){return this.bidContinue?"START":"STOP";}
   private async addAllUser(){
     userManager.getInstance().allUsers = [];
     userManager.getInstance().bannedUser = [];
