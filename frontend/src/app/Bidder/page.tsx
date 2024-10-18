@@ -1,6 +1,7 @@
 "use client"
 
 import { cache, useEffect, useState } from "react"
+import { bidPlacedType, getControlType, newBidPriceType, newPlayerListedType, playerSoldType, userBannedType } from "../types/wsPSubStreamTypes";
 
 type playerDetailsType = {
   id : string,
@@ -109,42 +110,77 @@ export default function Page(){
   const [bidderList, setBidderList] = useState<[string, number][]>([
   ]);
   const [nextBid, setNextBid] = useState<number>(0);
-  useEffect(() => {
-    console.log("first use fetch")
-    fetch("http://localhost:3000/getCurrentPlayer",{cache:'no-cache'}).then(res => {
-      res.json().then(data => {
-        const newObj:playerDetailsType = {
-          id: data.msg.id,
-          name:data.msg.name,
-          currentPrice:data.msg.currentPrice,
-          basePrice : data.msg.basePrice
-        };
-        setPlayerDetails(newObj);
-        setNextBid(data.msg.nextBid);
+  useEffect(()=>{
+    const main = async()=>{
+      const res = await fetch("http://localhost:3000/getCurrentPlayer");
+      const body = await res.json();
+      const data = body.msg;
+      setPlayerDetails({
+        id: data.id,
+        name: data.name,
+        basePrice: data.basePrice,
+        currentPrice: data.currentPrice,
       });
-    }
-    );
-    // webSocket server initailization
-    let ws = new WebSocket('ws://localhost:3002');
-    ws.onmessage=message=>{
-      console.log("here")
-      try {
-        const data = JSON.parse(message.data);
-        if (data.type === "PUBLISH")
-        {
-          setPlayerDetails(prev => {
-            const newObj = { ...prev };
-            newObj.currentPrice = data.currentPrice;
-            console.log("here->", newObj)
-            return newObj;
-          });
-          setNextBid(data.nextPrice);
-          setBidderList(prev=> [...prev,[data.bidderId,data.currentPrice]]);
+      setNextBid(data.nextPrice);
+
+      const wsClient = new WebSocket("http://localhost:3002/");
+      wsClient.onmessage = (message) => {
+        const msg = JSON.parse(message.data);
+        const body = msg.body;
+        switch (msg.type) {
+          case (newPlayerListedType): {
+            setPlayerDetails({
+              id: body.playerId,
+              name: body.playerName,
+              basePrice: body.basePrice,
+              currentPrice: body.currentPrice,
+            })
+            setNextBid(body.currentPrice);
+            break;
+          }
+          case (bidPlacedType): {
+            setPlayerDetails((prev) => {
+              if (prev.id === body.playerId)
+                return {
+                  ...prev,
+                  currentPrice: body.amount,
+                }
+              else {
+                //get the latest user
+                alert("reload this page as player is not up to date");
+                return prev;
+              }
+            });
+            break;
+          }
+          case newBidPriceType: {
+            setPlayerDetails(prev => {
+              if (prev.id === body.playerId)
+                setNextBid(body.nextPrice);
+              else {
+                alert("reload this page as player is not up to date");
+              }
+              return prev;
+            });
+            break;
+          }
+          case userBannedType:{
+            alert(body);
+            break;
+          }
+          case playerSoldType:{
+            alert(body);
+            break;
+          }
+          case getControlType:{
+            alert(body.state);
+            break;
+          }
         }
       }
-      catch(err) {console.log(err)};
-    };
-  }, []);
+    }
+    main();
+  },[]);
   console.log(">_<")
   if(playerDetails.id === "")return (
     <>

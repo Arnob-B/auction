@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { bidPlacedType, newBidPriceType, newPlayerListedType } from "../types/wsPSubStreamTypes";
 const headerContent = {
   'Content-Type': 'application/json',
 }
@@ -44,12 +45,25 @@ const BanUser = ()=>{
   )
 }
 const AddPlayer=()=>{
+  const [id, setId] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [price, setPrice] = useState(0);
+  const addPlayerHandler = async()=>{
+    const res = await fetch('http://localhost:3000/admin/addPlayer',{
+      method:"POST",
+      headers:headerContent,
+      body:JSON.stringify({
+          id:id,
+          name:name,
+          basePrice:price
+        })
+    })
+  }
   return(
   <>
   <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
   <div className="p-4">
     <h2 className="text-xl font-bold text-white text-center">Add Player</h2>
-    <form className="mt-4">
       <div className="mb-4">
         <label for="playerId" className="block text-white">Player ID</label>
         <input 
@@ -57,6 +71,8 @@ const AddPlayer=()=>{
           id="playerId" 
           className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500" 
           placeholder="Enter Player ID" 
+          value = {id}
+          onChange={(e)=>setId(e.target.value)}
           required 
         />
         <label for="playerName" className="block text-white">Player Name</label>
@@ -65,6 +81,8 @@ const AddPlayer=()=>{
           id="playerId" 
           className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500" 
           placeholder="Enter Player Name" 
+          value = {name}
+          onChange={(e)=>setName(e.target.value)}
           required 
         />
         <label for="basePrice" className="block text-white">Base Price</label>
@@ -73,16 +91,18 @@ const AddPlayer=()=>{
           id="playerId" 
           className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500" 
           placeholder="Enter base Price" 
+          value = {price}
+          onChange={(e)=>setPrice(parseInt(e.target.value)|| 0)}
           required 
         />
       </div>
       <button 
         type="submit" 
         className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+        onClick={addPlayerHandler}
       >
         Add Player
       </button>
-    </form>
   </div>
 </div>
 </>
@@ -142,17 +162,23 @@ const PriceControl = () => {
     </div>
   );
 };
-const BidProfile = () => {
+const BidProfile = ({playerDetails}:{playerDetails:{
+    playerId:string,
+    playerName: string,
+    basePrice: number,
+    currentPrice: number,
+    nextPrice:number
+}}) => {
   return (
     <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
       <div className="p-4">
         <h2 className="text-xl font-bold text-white text-center">Bid Profile</h2>
         <div className="mt-4">
-          <p className="text-white">Player ID: <span className="font-semibold">12345</span></p>
-          <p className="text-white">Player Name: <span className="font-semibold">12345</span></p>
-          <p className="text-white">Base Price: <span className="font-semibold text-green-400">$1,000,000</span></p>
-          <p className="text-white">Current Price: <span className="font-semibold text-green-400">$1,200,000</span></p>
-          <p className="text-white">Next Bid Price: <span className="font-semibold text-green-400">$50,000</span></p>
+          <p className="text-white">Player ID: <span className="font-semibold">{playerDetails.playerId}</span></p>
+          <p className="text-white">Player Name: <span className="font-semibold">{playerDetails.playerName}</span></p>
+          <p className="text-white">Base Price: <span className="font-semibold text-green-400">{playerDetails.basePrice}</span></p>
+          <p className="text-white">Current Price: <span className="font-semibold text-green-400">{playerDetails.currentPrice}</span></p>
+          <p className="text-white">Next Bid Price: <span className="font-semibold text-green-400">{playerDetails.nextPrice}</span></p>
         </div>
       </div>
     </div>
@@ -161,7 +187,7 @@ const BidProfile = () => {
 const BidControl = () => {
   const   onSellHandler = async ()=>{
     const res = await fetch("http://localhost:3000/admin/sellPlayer",{method:"POST"});
-    console.log(res);
+    alert(res);
   }
   const onStartHandler = async ()=>{
     const res = await fetch("http://localhost:3000/admin/controls",{
@@ -171,7 +197,7 @@ const BidControl = () => {
         state:"START"
       })
     });
-    console.log(res);
+    alert(res);
   }
   const onStopHandler = async () => {
     const res = await fetch("http://localhost:3000/admin/controls", {
@@ -181,7 +207,7 @@ const BidControl = () => {
         state: "STOP"
       })
     });
-    console.log(res);
+    alert(res);
   }
   return (
     <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
@@ -212,9 +238,82 @@ const BidControl = () => {
   )
 }
 export default function Page() {
+  const [playerDetails,setPlayerDetails] = useState<{
+    playerId:string,
+    playerName: string,
+    basePrice: number,
+    currentPrice: number,
+    nextPrice:number
+  }>({
+    playerId:"",
+    playerName: "",
+    basePrice: 0,
+    currentPrice: 0,
+    nextPrice:0
+  });
+  useEffect(()=>{
+    const main = async()=>{
+      const res = await fetch("http://localhost:3000/getCurrentPlayer");
+      const body = await res.json();
+      const data = body.msg;
+      setPlayerDetails({
+        playerId: data.id,
+        playerName: data.name,
+        basePrice: data.basePrice,
+        currentPrice: data.currentPrice,
+        nextPrice: data.nextBid
+      });
+
+      const wsClient = new WebSocket("http://localhost:3003/");
+      wsClient.onmessage = (message) => {
+        const msg = JSON.parse(message.data);
+        if (msg.type === newPlayerListedType) {
+          const body = msg.body;
+          setPlayerDetails({
+            playerId: body.playerId,
+            playerName: body.playerName,
+            basePrice: body.basePrice,
+            currentPrice: body.currentPrice,
+            nextPrice: body.currentPrice
+          })
+        }
+        if (msg.type === bidPlacedType) {
+          const body = msg.body;
+          setPlayerDetails((prev) => {
+            if (prev.playerId === body.playerId)
+              return {
+                ...prev,
+                currentPrice: body.amount,
+                nextPrice: body.nextPrice,
+              }
+            else {
+              //get the latest user
+              alert("reload this page as player is not up to date");
+              return prev;
+            }
+          });
+        }
+        if (msg.type === newBidPriceType) {
+          const body = msg.body;
+          setPlayerDetails(prev => {
+            if (prev.playerId === body.playerId)
+              return {
+                ...prev,
+                nextPrice: body.nextPrice
+              }
+            else {
+              alert("reload this page as player is not up to date");
+              return prev;
+            }
+          });
+        }
+      }
+    }
+    main();
+  },[]);
   return (
     <>
-      <BidProfile></BidProfile>
+      <BidProfile playerDetails={playerDetails}></BidProfile>
       <BidControl></BidControl>
       <PriceControl></PriceControl>
       <AddPlayer></AddPlayer>

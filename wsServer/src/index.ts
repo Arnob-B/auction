@@ -21,7 +21,6 @@ wss.on('connection', socket => {
 });
 
 adminWss.on('connection',socket=>{
-  socket.send("welcome to admin socket");
   userManager.getInstance().addAdmin(socket);
 })
 
