@@ -1,10 +1,9 @@
+import { PrismaClient } from "@prisma/client";
 import { createClient } from "redis";
+import dbManager from "./utils/dbManager";
 
 
 const main = async ()=>{
-  const client = createClient();
-  await client.connect();
-  while (true) {
-    const msg = await client.rPop("dbProcess");
-  }
+  dbManager.getInstance().sellPlayer("player2","user1",200);
 }
+main();

@@ -13,11 +13,6 @@ export class User{
     this.ws.send(JSON.stringify(msg));
   }
   public listener(){
-    this.ws.on('message',(message)=>{
-      const msg:engineMessage = JSON.parse(message.toString());
-      if(msg.type === publish)
-      {userManager.getInstance().emitMsg(msg);}
-    })
     this.ws.on("close",(message)=>{
       console.log(`${this.id} closed`);
     })

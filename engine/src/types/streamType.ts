@@ -20,6 +20,15 @@ export type placeBidBody = {
   bidderId: string,
   bidAmnt: number
 }
+export const setControl = "CONTROL";
+export type setControlBody = {
+  state: "START"|"STOP"
+}
+
+export const changeNextPrice = "CHANGE_NEXT_PRICE";
+export type changeNextPriceBody = {
+  incrementPrice:number
+}
 
 export const getCurrentPlayer = "GET_CURRENT_PLAYER"
 
@@ -49,4 +58,12 @@ export type messagesFromApiType = {
   type:typeof getCurrentPlayer,
   body?:string,
   clientId:string,
+}|{
+  type:typeof setControl,
+  body:setControlBody,
+  clientId:string
+}|{
+  type:typeof changeNextPrice,
+  body:changeNextPriceBody,
+  clientId:string
 };
