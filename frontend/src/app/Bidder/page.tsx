@@ -100,6 +100,32 @@ function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
     </div>
   )
 }
+const AlertBox = ({ playerName, bidderName, sellingAmount, onClose }) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm mx-auto text-center">
+        <h2 className="text-2xl font-bold text-white mb-2">
+          🎉 Player Sold! 🎉
+        </h2>
+        <p className="text-gray-300">
+          Player Name: <span className="text-white">{playerName}</span>
+        </p>
+        <p className="text-gray-300">
+          Bidder Name: <span className="text-white">{bidderName}</span>
+        </p>
+        <p className="text-gray-300">
+          Selling Amount: <span className="text-white">${sellingAmount}</span>
+        </p>
+        <button
+          onClick={onClose}
+          className="mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-500 transition"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 export default function Page(){
   const [playerDetails, setPlayerDetails] = useState<playerDetailsType>({
     id: "",
@@ -110,6 +136,20 @@ export default function Page(){
   const [bidderList, setBidderList] = useState<[string, number][]>([
   ]);
   const [nextBid, setNextBid] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState<{
+    playerName:string
+    state:boolean,
+    bidderName:string,
+    amount:number
+  }>({
+    playerName:"",
+    state:false,
+    bidderName:"",
+    amount:0
+  });
+  const handleClose = () => {
+    setIsOpen(prev=>{return {...prev,state:false}});
+  };
   useEffect(()=>{
     const main = async()=>{
       const res = await fetch("http://localhost:3000/getCurrentPlayer");
@@ -121,7 +161,7 @@ export default function Page(){
         basePrice: data.basePrice,
         currentPrice: data.currentPrice,
       });
-      setNextBid(data.nextPrice);
+      setNextBid(data.nextBid);
 
       const wsClient = new WebSocket("http://localhost:3002/");
       wsClient.onmessage = (message) => {
@@ -141,10 +181,13 @@ export default function Page(){
           case (bidPlacedType): {
             setPlayerDetails((prev) => {
               if (prev.id === body.playerId)
+              {
+                setNextBid(body.nextPrice);
                 return {
                   ...prev,
                   currentPrice: body.amount,
                 }
+              }
               else {
                 //get the latest user
                 alert("reload this page as player is not up to date");
@@ -169,7 +212,15 @@ export default function Page(){
             break;
           }
           case playerSoldType:{
-            alert(body);
+            console.log(body)
+            setIsOpen(prev=>{
+              return {
+                state: true,
+                playerName: body.playerName,
+                bidderName: body.bidderName,
+                amount: body.amount
+              }
+            });
             break;
           }
           case getControlType:{
@@ -189,6 +240,14 @@ export default function Page(){
   )
   return(
     <div className="w-screen h-screen flex-col items-center">
+      {isOpen.state && (
+        <AlertBox
+          playerName={isOpen.playerName}
+          bidderName={isOpen.bidderName}
+          sellingAmount={isOpen.amount}
+          onClose={handleClose}
+        />
+      )}
       <Card playerDetails={playerDetails}></Card>
       <PlaceBid bidAmnt={nextBid} playerId={playerDetails.id} ></PlaceBid>
       <LeaderBoard bidderList={bidderList}></LeaderBoard>

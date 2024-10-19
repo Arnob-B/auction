@@ -193,7 +193,8 @@ export class engineManager{
       response = {
         type: "PLAYER_SOLD",
         body: {
-          playerId: "",
+          playerId: player.getInstance().id,
+          playerName: player.getInstance().name,
           bidderId: "",
           bidderName: "No one",
           amount: 0
@@ -208,6 +209,7 @@ export class engineManager{
         type: "PLAYER_SOLD",
         body: {
           playerId: player.getInstance().id,
+          playerName: player.getInstance().name,
           bidderId: userManager.getInstance().allUsers[ind].getDetails().userId,
           bidderName: userManager.getInstance().allUsers[ind].getDetails().userName,
           amount: player.getInstance().currentPrice
