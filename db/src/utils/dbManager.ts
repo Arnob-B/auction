@@ -9,8 +9,8 @@ export default class dbManager{
     if(this.instance) return this.instance
     else return this.instance = new dbManager();
   }
-  public playerListed(playerId:string){
-    this.client.player.update(
+  public async  playerListed(playerId:string){
+    await this.client.player.update(
       {
         where:{id:playerId},
         data:{
@@ -20,6 +20,18 @@ export default class dbManager{
     )
   }
   public async playerSold(playerId:string,bidderId:string, amount:number){
+    if (bidderId === "" || playerId === "") {
+      if(playerId==="") return;
+      await this.client.player.update(
+        {
+          where: { id: playerId },
+          data: {
+            state: playerState.SOLD
+          }
+        }
+      )
+      return;
+    }
     const userBalance = await this.client.user.findFirst({
       where:{
         id:bidderId
@@ -33,7 +45,8 @@ export default class dbManager{
         {
           where: { id: playerId },
           data: {
-            ownerId: bidderId
+            ownerId: bidderId,
+            state: playerState.SOLD
           }
         }
       )
@@ -55,6 +68,7 @@ export default class dbManager{
     });
   }
   public async banUser(userId:string){
+    console.log("here",userId);
     await this.client.user.update({
       where:{
         id:userId

@@ -129,6 +129,7 @@ export class engineManager{
       //publish to ws pub sub
       await redisManager.getInstance().publishToWs(response);
       //db call
+      await redisManager.getInstance().pushToDBQueue(response);
     }
     return msg;
   }
@@ -160,6 +161,7 @@ export class engineManager{
               //publish to ws pub sub
               await redisManager.getInstance().publishToWs(response);
               // db queue push
+              await redisManager.getInstance().pushToDBQueue(response);
               return "bid placed";
             }
           } else return "you are not registered for the auction";
@@ -222,6 +224,7 @@ export class engineManager{
     //publish to ws pub sub
     await redisManager.getInstance().publishToWs(response);
     //db call with player remaining unsold
+    await redisManager.getInstance().pushToDBQueue(response);
     return "playerSold";
   }
   public async banUser(body:{userId:string}){
@@ -232,11 +235,12 @@ export class engineManager{
         const response: userBanned = {
           type: "USER_BANNED",
           body: {
-            userId: obj.getDetails().userName,
+            userId: obj.getDetails().userId,
             userName: obj.getDetails().userName,
           }
         }
         //dbcall
+        await redisManager.getInstance().pushToDBQueue(response);
         //publish to ws
         await redisManager.getInstance().publishToWs(response);
       }

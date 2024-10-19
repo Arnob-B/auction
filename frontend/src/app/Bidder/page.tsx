@@ -167,9 +167,6 @@ export default function Page(){
       setNextBid(data.nextBid);
 
       const wsClient = new WebSocket(generalWsApi);
-      wsClient.onopen = ()=>{
-        alert("connection made");
-      }
       wsClient.onmessage = (message) => {
         const msg = JSON.parse(message.data);
         const body = msg.body;
