@@ -1,9 +1,9 @@
+import { PrismaClient } from "@prisma/client";
 import { addPlayer, addPlayerBody, banUser, changeNextPrice, changeNextPriceBody,  getCurrentPlayer, messagesFromApiType, placeBid, placeBidBody, sellPlayer, setControl } from "../types/streamType";
 import { bidPlaced, getControl, newBidPrice, newPlayerListed, playerSold, userBanned } from "../types/wsPSubStreamTypes";
 import player from "./playerManager";
 import redisManager from "./redisManager";
 import { userManager } from "./userManager";
-import userSeed from "./userSeed";
 
 export class engineManager{
   private static instance:engineManager;
@@ -25,27 +25,23 @@ export class engineManager{
     return this.instance = new engineManager();
   }
   private async addAllUser(){
+    const client = new PrismaClient();
     userManager.getInstance().allUsers = [];
     userManager.getInstance().bannedUser = [];
     console.log("user addition started");
     console.log("db call made");
     // db call to get all the users from db;
+    const res = await client.user.findMany({
+      select:{
+        id:true,
+        name:true,
+        balance:true
+      }
+    });
     // db call to get all the users from db;
     console.log("users succesfully fetched from db");
-    let count = userSeed.length;
-    count/=10;
-    count =Math.floor(count);
-    process.stdout.write(`<`);
-    for(let a=0;a<userSeed.length;a++){
-      await new Promise((res)=>{
-        setTimeout(()=>{
-          userManager.getInstance().addUser(userSeed[a].id, userSeed[a].name, userSeed[a].balance);
-          res('');
-        },20)
-      })
-      if(a%count==0)process.stdout.write(`=`);
-    }
-    process.stdout.write(`>\n`);
+    for(let a of res)
+      userManager.getInstance().addUser(a.id,a.name,a.balance);
     console.log("users added sucessfully");
   }
   public async publishToApi(clientId:string,msg:string){
