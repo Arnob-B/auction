@@ -100,7 +100,7 @@ function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
     </div>
   )
 }
-const AlertBox = ({ playerName, bidderName, sellingAmount, onClose }) => {
+const AlertBox = ({ playerName, bidderName, sellingAmount, onClose }:{ playerName:string, bidderName:string, sellingAmount:number, onClose:boolean }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm mx-auto text-center">
