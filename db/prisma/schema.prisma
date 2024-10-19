@@ -12,16 +12,23 @@ model User{
   name String 
   password String
   balance Int
+  isBanned Boolean @default(false)
   players Player[]
   bids bids[]
 }
 
 
+enum playerState{
+  NOTLISTED
+  LISTED
+  SOLD
+}
+
 model Player{
   id String @id @unique
   name String
   basePrice Int
-  isListed Boolean @default(false)
+  state playerState @default(NOTLISTED)
   owner User @relation(fields:[ownerId],references: [id])
   ownerId String @default("")
   bids bids[]

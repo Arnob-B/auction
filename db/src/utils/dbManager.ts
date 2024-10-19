@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient ,playerState} from "@prisma/client";
 export default class dbManager{
   private client :PrismaClient;
   private  static instance : dbManager;
@@ -14,7 +14,7 @@ export default class dbManager{
       {
         where:{id:playerId},
         data:{
-          isListed :true
+          state : playerState.LISTED
         }
       }
     )
@@ -54,6 +54,14 @@ export default class dbManager{
       }
     });
   }
-  public async banUser(){
+  public async banUser(userId:string){
+    await this.client.user.update({
+      where:{
+        id:userId
+      },
+      data:{
+        isBanned:true
+      }
+    });
   }
 };
