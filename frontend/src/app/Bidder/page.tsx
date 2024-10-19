@@ -100,7 +100,7 @@ function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
     </div>
   )
 }
-const AlertBox = ({ playerName, bidderName, sellingAmount, onClose }:{ playerName:string, bidderName:string, sellingAmount:number, onClose:boolean }) => {
+const AlertBox = ({ playerName, bidderName, sellingAmount, onClose }:{ playerName:string, bidderName:string, sellingAmount:number, onClose:Function }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm mx-auto text-center">
@@ -194,6 +194,12 @@ export default function Page(){
                 return prev;
               }
             });
+            setBidderList(prev=>{
+              return [
+                ...prev,
+                [body.bidderName,body.amount]
+              ];
+            })
             break;
           }
           case newBidPriceType: {
