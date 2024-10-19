@@ -185,6 +185,7 @@ export class engineManager{
   public async sellPlayer() {
     const winnerId = player.getInstance().currentWinningBidder;
     let response: playerSold;
+    this.controls({state:"STOP"});
     if (winnerId === "") {
       response = {
         type: "PLAYER_SOLD",

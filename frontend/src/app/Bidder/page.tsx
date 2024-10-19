@@ -3,7 +3,7 @@
 import { cache, useEffect, useState } from "react"
 import { bidPlacedType, getControlType, newBidPriceType, newPlayerListedType, playerSoldType, userBannedType } from "../types/wsPSubStreamTypes";
 import toast,{Toaster} from "react-hot-toast";
-import { generalApi } from "../keys/generalApi";
+import { generalApi, generalWsApi } from "../keys/generalApi";
 
 type playerDetailsType = {
   id : string,
@@ -165,7 +165,10 @@ export default function Page(){
       });
       setNextBid(data.nextBid);
 
-      const wsClient = new WebSocket("http://localhost:3002/");
+      const wsClient = new WebSocket(generalWsApi);
+      wsClient.onopen = ()=>{
+        alert("connection made");
+      }
       wsClient.onmessage = (message) => {
         const msg = JSON.parse(message.data);
         const body = msg.body;
