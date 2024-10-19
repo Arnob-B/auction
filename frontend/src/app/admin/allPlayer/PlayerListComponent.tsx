@@ -1,5 +1,7 @@
 "use client"
+import { adminApi } from '@/app/keys/adminKeys';
 import React, { useState } from 'react';
+import toast,{Toaster} from 'react-hot-toast';
 
 const headerContent = {
   'Content-Type': 'application/json',
@@ -26,7 +28,7 @@ export const PlayerList = ({ players }: {
 
   const listPlayerHandler = (playerId: string, playerName: string, basePrice: number) => {
     return async () => {
-      const res = await fetch('http://localhost:3000/admin/addPlayer', {
+      const res = await fetch(adminApi+'/addPlayer', {
         method: "POST",
         headers: headerContent,
         body: JSON.stringify({
@@ -34,7 +36,10 @@ export const PlayerList = ({ players }: {
           name: playerName,
           basePrice: basePrice
         })
-      })
+      });
+      const json = await res.json();
+      if(json.msg === "playerAlreadyInBid") toast.error("player already in bid");
+      else toast.success(json.msg);
     };
   };
 
@@ -52,6 +57,32 @@ export const PlayerList = ({ players }: {
   };
 
   return (
+    <>
+      <Toaster
+        position="bottom-left"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          className: '',
+          duration: 5000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: 'green',
+              secondary: 'black',
+            },
+          },
+        }}
+      />
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-3xl border border-green-500">
         <h2 className="text-3xl font-bold mb-4 text-green-300">Player List</h2>
@@ -119,5 +150,6 @@ export const PlayerList = ({ players }: {
         </table>
       </div>
     </div>
+    </>
   );
 };

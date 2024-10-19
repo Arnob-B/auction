@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { bidPlacedType } from "../../types/wsPSubStreamTypes";
+import { adminWsApi } from "@/app/keys/adminKeys";
 
 
 const LeaderBoard = ({ bidders }:{
@@ -67,7 +68,7 @@ export default function Page(){
   }>>([]);
 
   useEffect(()=>{
-    const wsClient = new WebSocket('ws://localhost:3003/');
+    const wsClient = new WebSocket(adminWsApi);
     wsClient.onmessage=message=>{
       try {
         const msg = message.data;

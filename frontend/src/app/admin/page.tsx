@@ -1,19 +1,24 @@
 "use client"
 import { useEffect, useState } from "react";
 import { bidPlacedType, newBidPriceType, newPlayerListedType } from "../types/wsPSubStreamTypes";
+import toast,{Toaster} from "react-hot-toast";
+import { adminApi, adminWsApi } from "../keys/adminKeys";
+import { generalApi } from "../keys/generalApi";
 const headerContent = {
   'Content-Type': 'application/json',
 }
 const BanUser = ()=>{
   const [userId, setUserId] = useState("");
   const banUserHandler = async ()=>{
-    await fetch('http://localhost:3000/admin/banUser',{
+    const res = await fetch(adminApi+'/banUser',{
       method:"POST",
       headers:headerContent,
       body: JSON.stringify({
         userId: userId
       })
     });
+    const json = await res.json();
+    toast(json.msg);
   }
   return (
     <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
@@ -49,7 +54,7 @@ const AddPlayer=()=>{
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState(0);
   const addPlayerHandler = async()=>{
-    const res = await fetch('http://localhost:3000/admin/addPlayer',{
+    const res = await fetch(adminApi+'/addPlayer',{
       method:"POST",
       headers:headerContent,
       body:JSON.stringify({
@@ -58,6 +63,8 @@ const AddPlayer=()=>{
           basePrice:price
         })
     })
+    const json = await res.json();
+    toast(json.msg);
   }
   return(
   <>
@@ -115,7 +122,7 @@ const PriceControl = () => {
 
   const priceChangeHandler = async () => {
     try {
-      const res = await fetch('http://localhost:3000/admin/changeNextPrice', {
+      const res = await fetch(adminApi+'/changeNextPrice', {
         method: 'POST',
         headers: headerContent,
         body: JSON.stringify({ incrementPrice: price }),
@@ -126,7 +133,7 @@ const PriceControl = () => {
       }
 
       const data = await res.json(); // Handle the response data as needed
-      console.log(data);
+      toast(data.msg);
     } catch (error) {
       console.error('Price change error:', error);
     }
@@ -186,28 +193,31 @@ const BidProfile = ({playerDetails}:{playerDetails:{
 }
 const BidControl = () => {
   const   onSellHandler = async ()=>{
-    const res = await fetch("http://localhost:3000/admin/sellPlayer",{method:"POST"});
-    alert(res);
+    const res = await fetch(adminApi+"/sellPlayer",{method:"POST"});
+    const json = await res.json();
+    toast(json.msg);
   }
   const onStartHandler = async ()=>{
-    const res = await fetch("http://localhost:3000/admin/controls",{
+    const res = await fetch(adminApi+"/controls",{
       method:"POST",
       headers:headerContent,
       body:JSON.stringify({
         state:"START"
       })
     });
-    alert(res);
+    const json =await res.json();
+    toast(json.msg);
   }
   const onStopHandler = async () => {
-    const res = await fetch("http://localhost:3000/admin/controls", {
+    const res = await fetch(adminApi+'/controls', {
       method:"POST",
       headers:headerContent,
       body: JSON.stringify({
         state: "STOP"
       })
     });
-    alert(res);
+    const json =await res.json();
+    toast(json.msg);
   }
   return (
     <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
@@ -253,7 +263,7 @@ export default function Page() {
   });
   useEffect(()=>{
     const main = async()=>{
-      const res = await fetch("http://localhost:3000/getCurrentPlayer");
+      const res = await fetch(generalApi+"/getCurrentPlayer");
       const body = await res.json();
       const data = body.msg;
       setPlayerDetails({
@@ -264,7 +274,7 @@ export default function Page() {
         nextPrice: data.nextBid
       });
 
-      const wsClient = new WebSocket("http://localhost:3003/");
+      const wsClient = new WebSocket(adminWsApi);
       wsClient.onmessage = (message) => {
         const msg = JSON.parse(message.data);
         if (msg.type === newPlayerListedType) {
@@ -313,6 +323,31 @@ export default function Page() {
   },[]);
   return (
     <>
+      <Toaster
+        position="bottom-left"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          className: '',
+          duration: 5000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: 'green',
+              secondary: 'black',
+            },
+          },
+        }}
+      />
       <BidProfile playerDetails={playerDetails}></BidProfile>
       <BidControl></BidControl>
       <PriceControl></PriceControl>

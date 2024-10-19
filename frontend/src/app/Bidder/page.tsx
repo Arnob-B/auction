@@ -2,6 +2,8 @@
 
 import { cache, useEffect, useState } from "react"
 import { bidPlacedType, getControlType, newBidPriceType, newPlayerListedType, playerSoldType, userBannedType } from "../types/wsPSubStreamTypes";
+import toast,{Toaster} from "react-hot-toast";
+import { generalApi } from "../keys/generalApi";
 
 type playerDetailsType = {
   id : string,
@@ -51,7 +53,7 @@ function LeaderBoard({bidderList}:{bidderList:[string,number][]}){
 function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
   const [id,setId] = useState<string>("");
   function submit(){
-    fetch('http://localhost:3000/bid', {
+    fetch(generalApi+'/bid', {
       method:"POST",
       headers: {
         'Accept': 'application/json',
@@ -65,7 +67,7 @@ function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
   )
     }).then(res=>{
       res.json().then(data=>{
-        console.log(data);
+        toast(data.msg);
       })
     }
     )
@@ -152,7 +154,7 @@ export default function Page(){
   };
   useEffect(()=>{
     const main = async()=>{
-      const res = await fetch("http://localhost:3000/getCurrentPlayer");
+      const res = await fetch(generalApi+'/getCurrentPlayer');
       const body = await res.json();
       const data = body.msg;
       setPlayerDetails({
@@ -169,6 +171,7 @@ export default function Page(){
         const body = msg.body;
         switch (msg.type) {
           case (newPlayerListedType): {
+            toast.success("new player is listed");
             setPlayerDetails({
               id: body.playerId,
               name: body.playerName,
@@ -203,6 +206,7 @@ export default function Page(){
             break;
           }
           case newBidPriceType: {
+            toast("new price is set");
             setPlayerDetails(prev => {
               if (prev.id === body.playerId)
                 setNextBid(body.nextPrice);
@@ -214,7 +218,7 @@ export default function Page(){
             break;
           }
           case userBannedType:{
-            alert(body);
+            toast(`${body.userName} is banned`);
             break;
           }
           case playerSoldType:{
@@ -230,7 +234,8 @@ export default function Page(){
             break;
           }
           case getControlType:{
-            alert(body.state);
+            if(body.state === "START") toast.success("bidding resumed");
+            if(body.state === "STOP") toast.error("bidding paused");
             break;
           }
         }
@@ -246,6 +251,31 @@ export default function Page(){
   )
   return(
     <div className="w-screen h-screen flex-col items-center">
+      <Toaster
+        position="bottom-left"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          className: '',
+          duration: 5000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: 'green',
+              secondary: 'black',
+            },
+          },
+        }}
+      />
       {isOpen.state && (
         <AlertBox
           playerName={isOpen.playerName}
