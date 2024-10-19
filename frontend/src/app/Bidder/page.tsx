@@ -119,8 +119,9 @@ const AlertBox = ({ playerName, bidderName, sellingAmount, onClose }:{ playerNam
           Selling Amount: <span className="text-white">${sellingAmount}</span>
         </p>
         <button
-          onClick={onClose}
           className="mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-500 transition"
+          //@ts-ignore
+          onClick={onClose}
         >
           Close
         </button>
