@@ -19,7 +19,7 @@ export default auth((req)=>{
     if(isProtectedRoute && !isLoggedIn) return NextResponse.redirect(`${nextUrl.origin}/`);
 
     // ADMIN ROUTES
-    if(isAdminRoute && role!=="admin") return NextResponse.redirect(`${nextUrl.origin}/Bidder`);
+    if(isAdminRoute && role!=="ADMIN") return NextResponse.redirect(`${nextUrl.origin}/Bidder`);
 
 })
 

@@ -7,16 +7,16 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 
 declare module "next-auth" {
     interface User{
-        userId?: string,
+        // userId?: string,
         role?: string
     }
     interface JWT{
-        userId: string,
+        // userId: string,
         role: string
     }
     interface Session {
       user: {
-        userId: string,
+        // userId: string,
         role: string
       } & DefaultSession["user"]
     }
@@ -28,9 +28,9 @@ export default{
             async authorize(credentials){
                 const validatedFields = loginSchema.safeParse(credentials);
                 if(validatedFields.success){
-                    const {userId, password} = validatedFields.data;
+                    const {id, password} = validatedFields.data;
 
-                    const user = await prisma.user.findFirst({where:{userId}});
+                    const user = await prisma.user.findFirst({where:{id}});
 
                     if (!user || !user.password) return null;
 
@@ -44,15 +44,15 @@ export default{
     ],
     callbacks: {
         async session({token,session}){
-            if(token?.userId)
-                session.user.userId = token.userId as string;
+            // if(token?.userId)
+                // session.user.userId = token.userId as string;
             if(token?.role)
                 session.user.role = token.role as string;
             return session;
         },
         async jwt({token,user}){
-            if(user?.userId)
-                token.userId = user.userId;
+            // if(user?.userId)
+                // token.userId = user.userId;
             if(user?.role)
                 token.role = user.role;
             return token;

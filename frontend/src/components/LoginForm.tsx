@@ -9,13 +9,13 @@ function LoginForm() {
   const router = useRouter();
   const [buttonText,setButtonText] = useState<string>('Login')
   const [loginData, setLoginData] = useState<z.infer<typeof loginSchema>>({
-    userId: '',
+    id: '',
     password: '',
     adminCode: ''
   })
 
   const [errors, setErrors] = useState<z.infer<typeof loginSchema>>({
-    userId: '',
+    id: '',
     password: '',
     adminCode: ''
   })
@@ -29,7 +29,7 @@ function LoginForm() {
 
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault();
-    setErrors({userId:'',password:'',adminCode:''})
+    setErrors({id:'',password:'',adminCode:''})
     setButtonText("Submitting..")
     const res = loginSchema.safeParse(loginData)
     if(!res.success){
@@ -57,8 +57,8 @@ function LoginForm() {
   return (
     <form className='flex flex-col gap-y-5' onSubmit={handleSubmit}>
       <div className='flex flex-col'>
-        <input type="text" placeholder='UserId' className='bg-transparent placeholder:text-black placeholder:text-sm border-b-black border-b px-2 outline-none' value={loginData.userId} onChange={e=>handleChange(e,"userId")}/>
-        <p className='text-red-500 text-sm'>{errors.userId??''}</p>
+        <input type="text" placeholder='UserId' className='bg-transparent placeholder:text-black placeholder:text-sm border-b-black border-b px-2 outline-none' value={loginData.id} onChange={e=>handleChange(e,"id")}/>
+        <p className='text-red-500 text-sm'>{errors.id??''}</p>
       </div>
       <div className='flex flex-col'>
         <input type="password" placeholder='Password' className='bg-transparent placeholder:text-black placeholder:text-sm border-b-black border-b px-2 outline-none' value={loginData.password} onChange={e=>handleChange(e,"password")}/>

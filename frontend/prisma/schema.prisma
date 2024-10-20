@@ -14,23 +14,21 @@ datasource db {
 }
 
 model User {
-  userId   String @id
+  id       String @id
   name     String
   password String
   role     String
-
-  @@map("users")
 }
 
-enum playerState{
+enum playerState {
   NOTLISTED
   LISTED
   SOLD
 }
 
-model Player{
-  id String @id @unique
-  name String
+model Player {
+  id        String      @id @unique
+  name      String
   basePrice Int
-  state playerState @default(NOTLISTED)
+  state     playerState @default(NOTLISTED)
 }

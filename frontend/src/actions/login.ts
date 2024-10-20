@@ -14,11 +14,11 @@ export const handleLogin = async (data:z.infer<typeof loginSchema>) => {
         return {errors:validatedFields.error.errors};
     }
 
-    const { userId, password, adminCode} = validatedFields.data;
+    const { id, password, adminCode} = validatedFields.data;
 
     try {
         await signIn("credentials",{
-            userId,
+            id,
             password,
             adminCode,
             redirectTo: "/Bidder"
