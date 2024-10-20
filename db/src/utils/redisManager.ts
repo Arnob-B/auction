@@ -1,13 +1,18 @@
 import { RedisClientType, createClient } from "redis";
 import { bidPlacedType, dbMessageType, newPlayerListedType, playerSoldType, userBannedType } from "../types/wsPubSubStream";
 import dbManager from "./dbManager";
+import dotenv from "dotenv"
+dotenv.config();
 export default class redisManager{
   private client:RedisClientType; // takes from queue
   private static instance: redisManager ;
   private initiated:boolean;
   private constructor(){
     console.log("redis Manager instialization started");
-    this.client = createClient();
+    this.client = createClient({
+      //@ts-ignore
+      url:process.env.CLIENT_URL
+    });
     this.client.connect();
     this.initiated = false;
     this.init();

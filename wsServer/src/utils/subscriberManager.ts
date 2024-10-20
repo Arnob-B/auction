@@ -1,13 +1,18 @@
 import { createClient, RedisClientType } from "redis";
 import userManager from "./userManager";
 import { bidPlacedType, getControlType, newBidPriceType, newPlayerListedType, playerSoldType, userBannedType, wsPublishMsg } from "../types/wsPSubStreamTypes";
+import dotenv from "dotenv"
+dotenv.config();
 
 export default class subscriberManager{
   private subscriber:RedisClientType;
   private static instance:subscriberManager;
   private constructor(){
+    console.log(process.env.SUBCRIBER_URL);
     console.log("subcriberManager started");
-    this.subscriber = createClient();
+    this.subscriber = createClient({
+      url:process.env.SUBCRIBER_URL
+    });
     this.subscriber.connect();
     this.init();
   }

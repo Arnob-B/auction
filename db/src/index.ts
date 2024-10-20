@@ -4,6 +4,7 @@ import redisManager from "./utils/redisManager";
 import { createClient } from "redis";
 
 const main = async () => {
+  await redisManager.getInstance();
   await dbManager.getInstance();
   const client = createClient();
   await client.connect();

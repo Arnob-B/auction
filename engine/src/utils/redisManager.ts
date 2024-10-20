@@ -12,10 +12,19 @@ export default class redisManager{
   private static instance: redisManager ;
   private initiated:boolean;
   private constructor(){
+    console.log(process.env.CLIENT_URL);
+    console.log(process.env.PUBLISH_URL);
+    console.log(process.env.DBQUEUE_URL);
     console.log("redis Manager instialization started");
-    this.client = createClient();
-    this.publisher = createClient();
-    this.pushToDB = createClient();
+    this.client = createClient({
+      url:process.env.CLIENT_URL
+    });
+    this.publisher = createClient({
+        url:process.env.PUBLISH_URL
+      });
+    this.pushToDB = createClient({
+      url:process.env.DBQUEUE_URL
+    });
     this.client.connect();
     this.publisher.connect();
     this.pushToDB.connect();

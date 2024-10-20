@@ -1,5 +1,7 @@
 import { RedisClientType, createClient } from "redis";
 import { addPlayerBody, messagesFromApiType } from "./types/streamType";
+import dotenv from "dotenv"
+dotenv.config();
 export default class redisManager{
   private subscriber:RedisClientType; 
   private client:RedisClientType;
@@ -7,8 +9,12 @@ export default class redisManager{
   private initiated:boolean;
   private constructor(){
     console.log("redis Manager instialization started");
-    this.subscriber = createClient();
-    this.client = createClient();
+    this.subscriber = createClient({
+      url:process.env.SUBSCRIBER_URL
+    });
+    this.client = createClient({
+      url:process.env.CLIENT_URL
+    });
     this.subscriber.connect();
     this.client.connect();
     this.initiated = false;
