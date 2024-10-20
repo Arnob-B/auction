@@ -25,7 +25,7 @@ const BanUser = ()=>{
       <div className="p-4">
         <h2 className="text-xl font-bold text-white text-center">Ban User</h2>
           <div className="mb-4">
-            <label for="userId" className="block text-white">User ID</label>
+            <label htmlFor="userId" className="block text-white">User ID</label>
             <input
               type="text"
               id="userId"
@@ -72,7 +72,7 @@ const AddPlayer=()=>{
   <div className="p-4">
     <h2 className="text-xl font-bold text-white text-center">Add Player</h2>
       <div className="mb-4">
-        <label for="playerId" className="block text-white">Player ID</label>
+        <label htmlFor="playerId" className="block text-white">Player ID</label>
         <input 
           type="text" 
           id="playerId" 
@@ -82,6 +82,11 @@ const AddPlayer=()=>{
           onChange={(e)=>setId(e.target.value)}
           required 
         />
+
+      </div>
+      <div className="mb-4">
+        <label htmlFor="incrementPrice" className="block text-white">Increment Price</label>
+
         <label for="playerName" className="block text-white">Player Name</label>
         <input 
           type="text" 
@@ -93,6 +98,7 @@ const AddPlayer=()=>{
           required 
         />
         <label for="basePrice" className="block text-white">Base Price</label>
+
         <input 
           type="number" 
           id="playerId" 
