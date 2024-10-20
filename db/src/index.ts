@@ -2,11 +2,15 @@ import { bidPlacedType, dbMessageType, newPlayerListedType, playerSoldType, user
 import dbManager from "./utils/dbManager";
 import redisManager from "./utils/redisManager";
 import { createClient } from "redis";
+import dotenv from "dotenv"
+dotenv.config()
 
 const main = async () => {
-  await redisManager.getInstance();
   await dbManager.getInstance();
-  const client = createClient();
+  const client = createClient({
+  //@ts-ignore
+    url:process.env.CLIENT_URL
+  });
   await client.connect();
   console.log("REDIS client setup done");
   while (true) {

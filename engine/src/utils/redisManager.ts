@@ -5,6 +5,9 @@ import player from "./playerManager";
 import { engineManager } from "./engineManager";
 import { userManager } from "./userManager";
 import { wsPublishMsg } from "../types/wsPSubStreamTypes";
+import dotenv from "dotenv"
+dotenv.config()
+
 export default class redisManager{
   private client:RedisClientType; // takes from queue
   private publisher:RedisClientType; // publishes to the sub and also the userPubsub
