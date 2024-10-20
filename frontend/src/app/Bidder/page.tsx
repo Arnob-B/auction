@@ -1,6 +1,9 @@
 "use client"
 
 import { cache, useEffect, useState } from "react"
+import { bidPlacedType, getControlType, newBidPriceType, newPlayerListedType, playerSoldType, userBannedType } from "../types/wsPSubStreamTypes";
+import toast,{Toaster} from "react-hot-toast";
+import { generalApi, generalWsApi } from "../keys/generalApi";
 
 type playerDetailsType = {
   id : string,
@@ -29,7 +32,6 @@ function Card({playerDetails}:{playerDetails:playerDetailsType}){
   )
 }
 function LeaderBoard({bidderList}:{bidderList:[string,number][]}){
-
   return(
     <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
       <div className="p-4 border-b border-gray-700">
@@ -51,7 +53,7 @@ function LeaderBoard({bidderList}:{bidderList:[string,number][]}){
 function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
   const [id,setId] = useState<string>("");
   function submit(){
-    fetch('http://localhost:3000/bid', {
+    fetch(generalApi+'/bid', {
       method:"POST",
       headers: {
         'Accept': 'application/json',
@@ -65,7 +67,7 @@ function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
   )
     }).then(res=>{
       res.json().then(data=>{
-        console.log(data);
+        toast(data.msg);
       })
     }
     )
@@ -100,6 +102,33 @@ function PlaceBid({playerId ,bidAmnt}:{playerId:string,  bidAmnt:number}) {
     </div>
   )
 }
+const AlertBox = ({ playerName, bidderName, sellingAmount, onClose }:{ playerName:string, bidderName:string, sellingAmount:number, onClose:Function }) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm mx-auto text-center">
+        <h2 className="text-2xl font-bold text-white mb-2">
+          🎉 Player Sold! 🎉
+        </h2>
+        <p className="text-gray-300">
+          Player Name: <span className="text-white">{playerName}</span>
+        </p>
+        <p className="text-gray-300">
+          Bidder Name: <span className="text-white">{bidderName}</span>
+        </p>
+        <p className="text-gray-300">
+          Selling Amount: <span className="text-white">${sellingAmount}</span>
+        </p>
+        <button
+          className="mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-500 transition"
+          //@ts-ignore
+          onClick={onClose}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 export default function Page(){
   const [playerDetails, setPlayerDetails] = useState<playerDetailsType>({
     id: "",
@@ -110,42 +139,111 @@ export default function Page(){
   const [bidderList, setBidderList] = useState<[string, number][]>([
   ]);
   const [nextBid, setNextBid] = useState<number>(0);
-  useEffect(() => {
-    console.log("first use fetch")
-    fetch("http://localhost:3000/getCurrentPlayer",{cache:'no-cache'}).then(res => {
-      res.json().then(data => {
-        const newObj:playerDetailsType = {
-          id: data.msg.id,
-          name:data.msg.name,
-          currentPrice:data.msg.currentPrice,
-          basePrice : data.msg.basePrice
-        };
-        setPlayerDetails(newObj);
-        setNextBid(data.msg.nextBid);
+  const [isOpen, setIsOpen] = useState<{
+    playerName:string
+    state:boolean,
+    bidderName:string,
+    amount:number
+  }>({
+    playerName:"",
+    state:false,
+    bidderName:"",
+    amount:0
+  });
+  const handleClose = () => {
+    setIsOpen(prev=>{return {...prev,state:false}});
+  };
+  useEffect(()=>{
+    const main = async()=>{
+      const res = await fetch(generalApi+'/getCurrentPlayer');
+      const body = await res.json();
+      const data = body.msg;
+      setPlayerDetails({
+        id: data.id,
+        name: data.name,
+        basePrice: data.basePrice,
+        currentPrice: data.currentPrice,
       });
-    }
-    );
-    // webSocket server initailization
-    let ws = new WebSocket('ws://localhost:3002');
-    ws.onmessage=message=>{
-      console.log("here")
-      try {
-        const data = JSON.parse(message.data);
-        if (data.type === "PUBLISH")
-        {
-          setPlayerDetails(prev => {
-            const newObj = { ...prev };
-            newObj.currentPrice = data.currentPrice;
-            console.log("here->", newObj)
-            return newObj;
-          });
-          setNextBid(data.nextPrice);
-          setBidderList(prev=> [...prev,[data.bidderId,data.currentPrice]]);
+      setNextBid(data.nextBid);
+
+      const wsClient = new WebSocket(generalWsApi);
+      wsClient.onmessage = (message) => {
+        const msg = JSON.parse(message.data);
+        const body = msg.body;
+        switch (msg.type) {
+          case (newPlayerListedType): {
+            toast.success("new player is listed");
+            setPlayerDetails({
+              id: body.playerId,
+              name: body.playerName,
+              basePrice: body.basePrice,
+              currentPrice: body.currentPrice,
+            })
+            setNextBid(body.currentPrice);
+            break;
+          }
+          case (bidPlacedType): {
+            setPlayerDetails((prev) => {
+              if (prev.id === body.playerId)
+              {
+                setNextBid(body.nextPrice);
+                return {
+                  ...prev,
+                  currentPrice: body.amount,
+                }
+              }
+              else {
+                //get the latest user
+                alert("reload this page as player is not up to date");
+                return prev;
+              }
+            });
+            setBidderList(prev=>{
+              return [
+                ...prev,
+                [body.bidderName,body.amount]
+              ];
+            })
+            break;
+          }
+          case newBidPriceType: {
+            toast("new price is set");
+            setPlayerDetails(prev => {
+              if (prev.id === body.playerId)
+                setNextBid(body.nextPrice);
+              else {
+                alert("reload this page as player is not up to date");
+              }
+              return prev;
+            });
+            break;
+          }
+          case userBannedType:{
+            toast(`${body.userName} is banned`);
+            break;
+          }
+          case playerSoldType:{
+            console.log(body)
+            setIsOpen(prev=>{
+              return {
+                state: true,
+                playerName: body.playerName,
+                bidderName: body.bidderName,
+                amount: body.amount
+              }
+            });
+            break;
+          }
+          case getControlType:{
+            if(body.state === "START") toast.success("bidding resumed");
+            if(body.state === "STOP") toast.error("bidding paused");
+            break;
+          }
         }
       }
-      catch(err) {console.log(err)};
-    };
-  }, []);
+    }
+    main();
+  },[]);
   console.log(">_<")
   if(playerDetails.id === "")return (
     <>
@@ -154,6 +252,39 @@ export default function Page(){
   )
   return(
     <div className="w-screen h-screen flex-col items-center">
+      <Toaster
+        position="bottom-left"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          className: '',
+          duration: 5000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: 'green',
+              secondary: 'black',
+            },
+          },
+        }}
+      />
+      {isOpen.state && (
+        <AlertBox
+          playerName={isOpen.playerName}
+          bidderName={isOpen.bidderName}
+          sellingAmount={isOpen.amount}
+          onClose={handleClose}
+        />
+      )}
       <Card playerDetails={playerDetails}></Card>
       <PlaceBid bidAmnt={nextBid} playerId={playerDetails.id} ></PlaceBid>
       <LeaderBoard bidderList={bidderList}></LeaderBoard>

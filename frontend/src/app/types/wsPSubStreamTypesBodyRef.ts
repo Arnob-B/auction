@@ -29,7 +29,6 @@ export type playerSold = {
   type: "PLAYER_SOLD",
   body: {
     playerId: string,
-    playerName:string,
     bidderId: string,
     bidderName: string,
     amount: number

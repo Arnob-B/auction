@@ -1,9 +1,9 @@
+import { PrismaClient } from "@prisma/client";
 import { addPlayer, addPlayerBody, banUser, changeNextPrice, changeNextPriceBody,  getCurrentPlayer, messagesFromApiType, placeBid, placeBidBody, sellPlayer, setControl } from "../types/streamType";
 import { bidPlaced, getControl, newBidPrice, newPlayerListed, playerSold, userBanned } from "../types/wsPSubStreamTypes";
 import player from "./playerManager";
 import redisManager from "./redisManager";
 import { userManager } from "./userManager";
-import userSeed from "./userSeed";
 
 export class engineManager{
   private static instance:engineManager;
@@ -24,29 +24,24 @@ export class engineManager{
     if(this.instance) return this.instance;
     return this.instance = new engineManager();
   }
-  public getStatus(){return this.bidContinue?"START":"STOP";}
   private async addAllUser(){
+    const client = new PrismaClient();
     userManager.getInstance().allUsers = [];
     userManager.getInstance().bannedUser = [];
     console.log("user addition started");
     console.log("db call made");
     // db call to get all the users from db;
+    const res = await client.user.findMany({
+      select:{
+        id:true,
+        name:true,
+        balance:true
+      }
+    });
     // db call to get all the users from db;
     console.log("users succesfully fetched from db");
-    let count = userSeed.length;
-    count/=10;
-    count =Math.floor(count);
-    process.stdout.write(`<`);
-    for(let a=0;a<userSeed.length;a++){
-      await new Promise((res)=>{
-        setTimeout(()=>{
-          userManager.getInstance().addUser(userSeed[a].id, userSeed[a].name, userSeed[a].balance);
-          res('');
-        },20)
-      })
-      if(a%count==0)process.stdout.write(`=`);
-    }
-    process.stdout.write(`>\n`);
+    for(let a of res)
+      userManager.getInstance().addUser(a.id,a.name,a.balance);
     console.log("users added sucessfully");
   }
   public async publishToApi(clientId:string,msg:string){
@@ -134,6 +129,7 @@ export class engineManager{
       //publish to ws pub sub
       await redisManager.getInstance().publishToWs(response);
       //db call
+      await redisManager.getInstance().pushToDBQueue(response);
     }
     return msg;
   }
@@ -165,6 +161,7 @@ export class engineManager{
               //publish to ws pub sub
               await redisManager.getInstance().publishToWs(response);
               // db queue push
+              await redisManager.getInstance().pushToDBQueue(response);
               return "bid placed";
             }
           } else return "you are not registered for the auction";
@@ -190,11 +187,13 @@ export class engineManager{
   public async sellPlayer() {
     const winnerId = player.getInstance().currentWinningBidder;
     let response: playerSold;
+    this.controls({state:"STOP"});
     if (winnerId === "") {
       response = {
         type: "PLAYER_SOLD",
         body: {
-          playerId: "",
+          playerId: player.getInstance().id,
+          playerName: player.getInstance().name,
           bidderId: "",
           bidderName: "No one",
           amount: 0
@@ -209,6 +208,7 @@ export class engineManager{
         type: "PLAYER_SOLD",
         body: {
           playerId: player.getInstance().id,
+          playerName: player.getInstance().name,
           bidderId: userManager.getInstance().allUsers[ind].getDetails().userId,
           bidderName: userManager.getInstance().allUsers[ind].getDetails().userName,
           amount: player.getInstance().currentPrice
@@ -224,6 +224,7 @@ export class engineManager{
     //publish to ws pub sub
     await redisManager.getInstance().publishToWs(response);
     //db call with player remaining unsold
+    await redisManager.getInstance().pushToDBQueue(response);
     return "playerSold";
   }
   public async banUser(body:{userId:string}){
@@ -234,11 +235,12 @@ export class engineManager{
         const response: userBanned = {
           type: "USER_BANNED",
           body: {
-            userId: obj.getDetails().userName,
+            userId: obj.getDetails().userId,
             userName: obj.getDetails().userName,
           }
         }
         //dbcall
+        await redisManager.getInstance().pushToDBQueue(response);
         //publish to ws
         await redisManager.getInstance().publishToWs(response);
       }

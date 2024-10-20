@@ -3,6 +3,7 @@ import { engineMessage, publish } from "../types/engineMessage";
 import { User } from "./user";
 export default class userManager{
   private allUsers:Map<string,User> = new Map();
+  private allAdmin:Map<string,User> = new Map();
   private static instance:userManager;
   private constructor(){};
   public static getInstance(){
@@ -16,8 +17,16 @@ export default class userManager{
     this.allUsers.set(rand,new User(socket,rand));
     console.log("user added ",rand);
   }
+  public addAdmin(socket:WebSocket){
+    const rand:string = this.getRandom();
+    this.allAdmin.set(rand,new User(socket,rand));
+    console.log("admin added ",rand);
+  }
   public delUser(id:string){
     this.allUsers.delete(id);
+  }
+  public emitAdmin(msg:string){
+    this.allAdmin.forEach(e=>e.sendMsg(msg));
   }
   public emitMsg(msg:string){
     this.allUsers.forEach(e=>e.sendMsg(msg));

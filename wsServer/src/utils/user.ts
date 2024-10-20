@@ -9,8 +9,8 @@ export class User{
     this.id = id;
     this.listener();
   }
-  public sendMsg(msg:any){
-    this.ws.send(JSON.stringify(msg));
+  public sendMsg(msg:string){
+    this.ws.send(msg);
   }
   public listener(){
     this.ws.on("close",(message)=>{

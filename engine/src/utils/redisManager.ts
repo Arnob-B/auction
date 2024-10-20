@@ -49,36 +49,7 @@ export default class redisManager{
   public async publishToWs(response: wsPublishMsg) {
     await this.publisher.publish("WSMESSAGE",JSON.stringify(response))
   }
-  public async pushToDBQueue(msgType:string){
-    let msg = {};
-    if(msgType === "STOREBID"){
-       msg = {
-        type:msgType,
-        playerId:player.getInstance().id,
-        bidderId:player.getInstance().currentWinningBidder,
-        amount:player.getInstance().currentPrice,
-      }
-    }
-    else if(msgType === "LISTPLAYER"){
-      msg = {
-        type:msgType,
-        playerId: player.getInstance().id,
-      }
-    }
-    else if (msgType === "PLAYERSOLD") {
-      msg = {
-        type:msgType,
-        playerId:player.getInstance().id,
-        bidderId:player.getInstance().currentWinningBidder,
-        ammount:player.getInstance().currentPrice,
-      }
-    }
-    else if (msgType === "USERBANNED") {
-      msg = {
-        type:msgType,
-        userId:player.getInstance().currentWinningBidder,
-      }
-    }
-    this.pushToDB.lPush("DBMSG", JSON.stringify(msg));
+  public async pushToDBQueue(msg:wsPublishMsg){
+    await this.pushToDB.lPush("DBMESSAGE", JSON.stringify(msg));
   }
 };

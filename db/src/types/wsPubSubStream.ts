@@ -1,3 +1,8 @@
+export const newPlayerListedType = "NEW_PLAYER_LISTED";
+export const bidPlacedType = "BID_PLACED";
+export const playerSoldType =  "PLAYER_SOLD";
+export const userBannedType = "USER_BANNED";
+
 export type newPlayerListed = {
   type:"NEW_PLAYER_LISTED",
   body:{
@@ -17,14 +22,6 @@ export type bidPlaced = {
     nextPrice: number
   }
 }
-export type newBidPrice = {
-      type: "NEW_BID_PRICE",
-      body: {
-        playerId: string,
-        nextPrice: number
-      }
-    }
-
 export type playerSold = {
   type: "PLAYER_SOLD",
   body: {
@@ -42,8 +39,4 @@ export type userBanned ={
     userName: string,
   }
 }
-export type getControl = {
-  type: "CONTROL",
-  body:{state: "START" | "STOP"}
-}
-export type wsPublishMsg =  newPlayerListed | bidPlaced | newBidPrice | playerSold | userBanned | getControl;
+export type dbMessageType =  newPlayerListed | bidPlaced |  playerSold | userBanned;
