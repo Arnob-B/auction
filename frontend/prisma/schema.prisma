@@ -12,17 +12,22 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum userRole {
+  USER
+  ADMIN
+}
+
 
 model User {
   userId   String @id
   name     String
   password String
-  role     String
+  role     userRole
 
   @@map("users")
 }
 
-enum playerState{
+enum playerState {
   NOTLISTED
   LISTED
   SOLD
