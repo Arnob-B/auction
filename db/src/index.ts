@@ -1,6 +1,5 @@
 import { bidPlacedType, dbMessageType, newPlayerListedType, playerSoldType, userBannedType } from "./types/wsPubSubStream";
 import dbManager from "./utils/dbManager";
-import redisManager from "./utils/redisManager";
 import { createClient } from "redis";
 import dotenv from "dotenv"
 dotenv.config()
