@@ -7,37 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id String @id @unique
-  name String 
-  balance Int
-  isBanned Boolean @default(false)
-  players Player[]
-  bids bids[]
+model User {
+  id       String   @id @unique
+  name     String
+  password String
+  role     String
+  balance  Int
+  isBanned Boolean  @default(false)
+  players  Player[]
+  bids     bids[]
 }
 
 
-enum playerState{
+enum playerState {
   NOTLISTED
   LISTED
   SOLD
 }
 
-model Player{
-  id String @id @unique
-  name String
+model Player {
+  id        String      @id @unique
+  name      String
+  imgLink   String
   basePrice Int
-  state playerState @default(NOTLISTED)
-  owner User @relation(fields:[ownerId],references: [id])
-  ownerId String @default("")
-  bids bids[]
+  state     playerState @default(NOTLISTED)
+  owner     User        @relation(fields: [ownerId], references: [id])
+  ownerId   String      @default("")
+  bids      bids[]
 }
 
-model bids{
-  bidId Int @id @default(autoincrement())
-  player Player @relation(fields: [playerId], references: [id])
-  user User @relation(fields: [bidderId],references: [id])
+model bids {
+  bidId    Int    @id @default(autoincrement())
+  player   Player @relation(fields: [playerId], references: [id])
+  user     User   @relation(fields: [bidderId], references: [id])
   playerId String
   bidderId String
-  amount Int
+  amount   Int
 }
