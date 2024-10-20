@@ -5,6 +5,7 @@ import {prisma} from "@/utils/db"
 import bcrypt from "bcryptjs"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 
+
 declare module "next-auth" {
     interface User{
         // userId?: string,
