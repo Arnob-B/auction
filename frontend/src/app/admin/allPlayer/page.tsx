@@ -3,10 +3,10 @@ import { PlayerList } from "./PlayerListComponent";
 
 export default async function  Page(){
   const client = new PrismaClient();
-  let players = [];
+  const players = [];
   const res = await client.player.findMany();
-  for(let a of res){
-    var state: 'Listed' | 'Not Listed' | 'Sold'; 
+  for(const a of res){
+    let state: 'Listed' | 'Not Listed' | 'Sold'; 
     switch (a.state){
       case playerState.LISTED:
         state = 'Listed';

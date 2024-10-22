@@ -87,7 +87,7 @@ const AddPlayer=()=>{
       <div className="mb-4">
         <label htmlFor="incrementPrice" className="block text-white">Increment Price</label>
 
-        <label for="playerName" className="block text-white">Player Name</label>
+        <label htmlFor="playerName" className="block text-white">Player Name</label>
         <input 
           type="text" 
           id="playerId" 
@@ -97,7 +97,7 @@ const AddPlayer=()=>{
           onChange={(e)=>setName(e.target.value)}
           required 
         />
-        <label for="basePrice" className="block text-white">Base Price</label>
+        <label htmlFor="basePrice" className="block text-white">Base Price</label>
 
         <input 
           type="number" 
