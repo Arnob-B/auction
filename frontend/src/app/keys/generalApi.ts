@@ -1,2 +1,2 @@
-export const generalApi = "http://localhost:3000"
-export const generalWsApi = "http://localhost:3002"
+export const generalApi = "http://auckipl.duckdns.org/api"
+export const generalWsApi = "http://auckipl.duckdns.org/generalWs"
