@@ -11,6 +11,7 @@ import {
 } from "../types/wsPSubStreamTypes";
 import toast, { Toaster } from "react-hot-toast";
 import { generalApi, generalWsApi } from "../keys/generalApi";
+import { BlobOptions } from "buffer";
 
 type playerDetailsType = {
 	id: string;
@@ -181,6 +182,8 @@ export default function Page() {
 		bidderName: "",
 		amount: 0,
 	});
+	const [isLive, setIsLive] = useState<boolean>(false);
+
 	const handleClose = () => {
 		setIsOpen((prev) => {
 			return { ...prev, state: false };
@@ -200,6 +203,15 @@ export default function Page() {
 			setNextBid(data.nextBid);
 
 			const wsClient = new WebSocket(generalWsApi);
+			wsClient.onopen = () =>{
+				setIsLive(prev=> true);
+				setInterval(() => {
+					wsClient.send("ping");
+				}, 50000);
+			}
+			wsClient.onclose = () =>{
+				setIsLive(prev=> false);
+			}
 			wsClient.onmessage = (message) => {
 				const msg = JSON.parse(message.data);
 				const body = msg.body;
@@ -308,9 +320,34 @@ export default function Page() {
 					onClose={handleClose}
 				/>
 			)}
+			<LiveButton isLive={isLive}></LiveButton>
 			<Card playerDetails={playerDetails}></Card>
 			<PlaceBid bidAmnt={nextBid} playerId={playerDetails.id}></PlaceBid>
 			<LeaderBoard bidderList={bidderList}></LeaderBoard>
 		</div>
 	);
 }
+function LiveButton({ isLive }:{isLive:boolean}) {
+  return (
+    <button
+      className={`px-6 py-2 font-bold text-white rounded-md relative 
+        ${isLive ? 'bg-red-500 animate-pulse neon-shadow' : 'bg-gray-400'}
+      `}
+      style={{
+        transition: 'all 0.3s ease-in-out',
+      }}
+    >
+      {isLive ? 'LIVE' : 'OFFLINE'}
+      <style jsx>{`
+        .neon-shadow {
+          box-shadow: 
+            0 0 5px #ff1a1a, 
+            0 0 10px #ff1a1a, 
+            0 0 20px #ff1a1a, 
+            0 0 40px #ff1a1a;
+        }
+      `}</style>
+    </button>
+  );
+}
+
