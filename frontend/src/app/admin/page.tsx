@@ -267,6 +267,7 @@ export default function Page() {
     currentPrice: 0,
     nextPrice:0
   });
+  const [isLive , setIsLive] = useState<boolean>(false);
   useEffect(()=>{
     const main = async()=>{
       const res = await fetch(generalApi+"/getCurrentPlayer");
@@ -281,6 +282,20 @@ export default function Page() {
       });
 
       const wsClient = new WebSocket(adminWsApi);
+      wsClient.onopen = ()=>{
+          
+        setInterval(()=>{
+          wsClient.send("ping");
+        },50000)
+        setIsLive(prev => {
+          return true;
+        })
+      }
+      wsClient.onclose = () => {
+        setIsLive(prev => {
+          return false;
+        })
+      }
       wsClient.onmessage = (message) => {
         const msg = JSON.parse(message.data);
         if (msg.type === newPlayerListedType) {
@@ -354,6 +369,7 @@ export default function Page() {
           },
         }}
       />
+      <LiveButton isLive={isLive}></LiveButton>
       <BidProfile playerDetails={playerDetails}></BidProfile>
       <BidControl></BidControl>
       <PriceControl></PriceControl>
@@ -361,4 +377,28 @@ export default function Page() {
       <BanUser></BanUser>
     </>
   )
+}
+
+function LiveButton({ isLive }) {
+  return (
+    <button
+      className={`px-6 py-2 font-bold text-white rounded-md relative 
+        ${isLive ? 'bg-red-500 animate-pulse neon-shadow' : 'bg-gray-400'}
+      `}
+      style={{
+        transition: 'all 0.3s ease-in-out',
+      }}
+    >
+      {isLive ? 'LIVE' : 'OFFLINE'}
+      <style jsx>{`
+        .neon-shadow {
+          box-shadow: 
+            0 0 5px #ff1a1a, 
+            0 0 10px #ff1a1a, 
+            0 0 20px #ff1a1a, 
+            0 0 40px #ff1a1a;
+        }
+      `}</style>
+    </button>
+  );
 }
