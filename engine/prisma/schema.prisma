@@ -16,4 +16,11 @@ model User{
   id String @id @unique
   name String 
   balance Int
+  isBanned Boolean
+  players Player[]
+}
+model Player{
+  id String @id
+  owner     User        @relation(fields: [ownerId], references: [id])
+  ownerId   String      @default("")
 }

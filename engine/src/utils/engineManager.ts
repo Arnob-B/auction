@@ -4,6 +4,8 @@ import { bidPlaced, getControl, newBidPrice, newPlayerListed, playerSold, userBa
 import player from "./playerManager";
 import redisManager from "./redisManager";
 import { userManager } from "./userManager";
+import dotenv from "dotenv"
+dotenv.config();
 
 export class engineManager{
   private static instance:engineManager;
@@ -35,14 +37,30 @@ export class engineManager{
       select:{
         id:true,
         name:true,
-        balance:true
-      }
+        balance:true,
+        isBanned:true,
+        players:{
+          select:{id:true}
+        },
+      },
     });
     // db call to get all the users from db;
     console.log("users succesfully fetched from db");
     for(let a of res)
-      userManager.getInstance().addUser(a.id,a.name,a.balance);
+    {
+      if(a.isBanned){
+        userManager.getInstance().banUser(a.id);
+      }
+      userManager.getInstance().addUser(a.id,a.name,a.balance,a.players.length);
+    }
     console.log("users added sucessfully");
+    console.log(userManager.getInstance().allUsers.length);
+    console.log(userManager.getInstance().bannedUser.length);
+  }
+  public testCheck(){
+    userManager.getInstance().allUsers.forEach((a)=>{
+      console.log(a.getDetails().userId,a.getDetails().playerCount);
+    })
   }
   public async publishToApi(clientId:string,msg:string){
     await redisManager.getInstance().publish(clientId,msg);
@@ -141,7 +159,14 @@ export class engineManager{
         if (!userManager.getInstance().isBanned(bidderId)) {
           const user = userManager.getInstance().allUsers.find(e => e.getDetails().userId === bidderId);
           if (user) {
+            //checking if current winning bidder or not
             if (bidderId === player.getInstance().currentWinningBidder) return "you are the current winning bidder";
+
+            //checking for max hold a player can
+            //by default env variables are treated as string
+            if(process.env.MAX_HOLD !== undefined){if(user.getDetails().playerCount >= parseInt(process.env.MAX_HOLD)) return "your limit to buy payer has been reached";}
+
+            //checking for sufficient balance
             if (user.getDetails().balance < bidAmnt) return  "you dont have sufficient money";
             else {
               player.getInstance().currentWinningBidder = bidderId;

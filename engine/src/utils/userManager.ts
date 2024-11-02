@@ -3,17 +3,20 @@ import { userType } from "../types/user";
 export class user{
   private id:string
   private name:string
-  private balance;
-  constructor(userId:string,userName:string,balance:number){
+  private balance:number;
+  private playerCount:number;
+  constructor(userId:string,userName:string,balance:number, playerCount :number){
     this.id = userId;
     this.name = userName;
     this.balance = balance;
+    this.playerCount = playerCount;
   }
   getDetails(){
     return {
       userId:this.id,
       userName:this.name,
       balance :this.balance,
+      playerCount:this.playerCount
     }
   }
   setBalance(bal:number){this.balance = bal;}
@@ -34,10 +37,10 @@ export class userManager{
        return this.instance;
     }
   }
-  public addUser(userId:string,userName:string,balance:number){
+  public addUser(userId:string,userName:string,balance:number,playerCount:number){
     if(!this.allUsers.find(e=>e.getDetails().userId === userId))
     {
-      this.allUsers.push(new user(userId,userName,balance));
+      this.allUsers.push(new user(userId,userName,balance,playerCount));
       return "new user added";
     }
     return "user already present"
