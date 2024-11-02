@@ -33,6 +33,7 @@ function LoginForm() {
     setButtonText("Submitting..")
     const res = loginSchema.safeParse(loginData)
     if(!res.success){
+      setButtonText("Login");
       console.log(res.error.errors)
       res.error.errors.map(error=>{
         setErrors(prev => ({
@@ -47,29 +48,25 @@ function LoginForm() {
         setButtonText("Redirecting..");
         router.push('/Bidder');
       }else{
+        setButtonText("Login");
         res?.errors?.map(error=>setErrors(prev=>({...prev, [error.path[0]]:`Invalid ${error.path[0]}` })))
         if(res?.error) setErrors(prev=>({...prev, "password": "Invalid Credentials" }))
         return;
       }
-    }).finally(()=>setButtonText("Submit"));
+    }).finally(()=>setButtonText("Login"));
   }
 
   return (
-    <form className='flex flex-col gap-y-5' onSubmit={handleSubmit}>
+    <form className='flex flex-col gap-y-6 mt-6' onSubmit={handleSubmit}>
       <div className='flex flex-col'>
-        <input type="text" placeholder='UserId' className='bg-transparent placeholder:text-black placeholder:text-sm border-b-black border-b px-2 outline-none' value={loginData.id} onChange={e=>handleChange(e,"id")}/>
+        <input type="text" placeholder='UserId' className='bg-transparent text-accent placeholder:text-sm font-opensans border-b-accent border-b px-2 outline-none' value={loginData.id} onChange={e=>handleChange(e,"id")}/>
         <p className='text-red-500 text-sm'>{errors.id??''}</p>
       </div>
       <div className='flex flex-col'>
-        <input type="password" placeholder='Password' className='bg-transparent placeholder:text-black placeholder:text-sm border-b-black border-b px-2 outline-none' value={loginData.password} onChange={e=>handleChange(e,"password")}/>
+        <input type="password" placeholder='Password' className='bg-transparent text-accent placeholder:text-sm font-opensans border-b-accent border-b px-2 outline-none text-lg' value={loginData.password} onChange={e=>handleChange(e,"password")}/>
         <p className='text-red-500 text-sm'>{errors.password ?? ''}</p>
       </div>
-        {/* <div className='flex flex-col mt-2'>
-        <label htmlFor="adminCode" className='text-[12px] font-semibold'>Only for admins</label>
-        <input type="text" name='adminCode' placeholder='Admin Code' className='bg-transparent placeholder:text-sm placeholder:text-black border-b-black border-b px-2 outline-none' value={loginData.adminCode} onChange={e=>handleChange(e,"adminCode")} />
-        <p className='text-red-500 text-sm'>{errors.adminCode??''}</p>
-        </div> */}
-        <button type="submit" className='bg-black text-white px-3 py-1 rounded-sm w-1/2 self-center'>{buttonText}</button>
+        <button type="submit" className='bg-primary text-background font-opensans px-3 py-1 my-4 rounded-sm w-1/2 self-center'>{buttonText}</button>
     </form>
   )
 }

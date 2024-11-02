@@ -271,7 +271,7 @@ export default function Page() {
 		};
 		main();
 	}, []);
-	console.log(">_<");
+	// console.log(">_<");
 	if (playerDetails.id === "") return <>No player listed now</>;
 	return (
 		<div className="w-screen h-screen flex-col items-center">
