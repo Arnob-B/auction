@@ -20,6 +20,10 @@ export class user{
     }
   }
   setBalance(bal:number){this.balance = bal;}
+  incrementPlayerCount(){
+    this.playerCount++;
+    return true;
+  }
 };
 export class userManager{
   public allUsers:Array<user>; 

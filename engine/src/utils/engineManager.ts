@@ -228,7 +228,10 @@ export class engineManager{
     else {
       const ind = userManager.getInstance().allUsers.findIndex(e => e.getDetails().userId === winnerId);
       let bal = userManager.getInstance().allUsers[ind].getDetails().balance;
+      //reducing the balance
       userManager.getInstance().allUsers[ind].setBalance(bal - player.getInstance().currentPrice);
+      //incrementing the player hold
+      userManager.getInstance().allUsers[ind].incrementPlayerCount();
       response = {
         type: "PLAYER_SOLD",
         body: {
