@@ -36,7 +36,7 @@ export default{
                     if (!user || !user.password) return null;
 
                     const passwordMatch = await bcrypt.compare(password,user.password);
-
+                    
                     if(passwordMatch) return user;
                 }
                 return null;
@@ -45,15 +45,15 @@ export default{
     ],
     callbacks: {
         async session({token,session}){
-            // if(token?.userId)
-                // session.user.userId = token.userId as string;
+            if(token?.id)
+                session.user.id = token.id as string;
             if(token?.role)
                 session.user.role = token.role as string;
             return session;
         },
         async jwt({token,user}){
-            // if(user?.userId)
-                // token.userId = user.userId;
+            if(user?.id)
+                token.id = user.id;
             if(user?.role)
                 token.role = user.role;
             return token;

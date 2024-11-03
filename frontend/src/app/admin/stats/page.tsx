@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react"
 import { bidPlacedType } from "../../types/wsPSubStreamTypes";
 import { adminWsApi } from "@/app/keys/adminKeys";
+import AdminNavbar from "@/components/AdminNavbar";
 
 
 const LeaderBoard = ({ bidders }:{
@@ -13,7 +14,9 @@ const LeaderBoard = ({ bidders }:{
   }>
 }) => {
   return (
-    <div className="max-w-lg mx-auto bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg shadow-lg overflow-hidden mt-6">
+    <div className="w-screen h-screen relative flex flex-col items-center">
+    <AdminNavbar />
+    <div className="mt-24 w-1/2 mx-auto bg-gradient-to-l from-black/60 to-secondary rounded-lg shadow-lg overflow-hidden">
       <h2 className="text-2xl font-bold text-white text-center p-4">Leaderboard</h2>
       <table className="min-w-full bg-gray-900 ">
         <thead>
@@ -52,9 +55,10 @@ const LeaderBoard = ({ bidders }:{
         }
         .animate-fadeIn {
           animation: fadeIn 0.5s forwards;
-        }
-      `}</style>
+          }
+          `}</style>
     </div>
+          </div>
   );
 };
 

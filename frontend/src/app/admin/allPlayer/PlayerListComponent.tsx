@@ -1,5 +1,6 @@
 "use client"
 import { adminApi } from '@/app/keys/adminKeys';
+import AdminNavbar from '@/components/AdminNavbar';
 import React, { useState } from 'react';
 import toast,{Toaster} from 'react-hot-toast';
 
@@ -38,7 +39,7 @@ export const PlayerList = ({ players }: {
         })
       });
       const json = await res.json();
-      if(json.msg === "playerAlreadyInBid") toast.error("player already in bid");
+      if(json.msg === "playerAlreadyInBid") toast.error("Player already in bid");
       else toast.success(json.msg);
     };
   };
@@ -83,9 +84,20 @@ export const PlayerList = ({ players }: {
           },
         }}
       />
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-3xl border border-green-500">
-        <h2 className="text-3xl font-bold mb-4 text-green-300">Player List</h2>
+    <div className="min-h-screen text-white flex items-center justify-center p-4 relative">
+      <AdminNavbar />
+      <button 
+      className='fixed bottom-5 right-5 bg-primary text-white h-7 w-7 rounded-full' 
+      onClick={()=>{
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        })
+      }}>
+        &uarr;
+        </button>
+      <div className="mt-20 rounded-lg shadow-lg p-6 w-full max-w-3xl bg-gradient-to-tr from-[#00000040] via-[#00000020] to-secondary backdrop-blur-lg border border-[#ffffff40]">
+        <h2 className="text-4xl font-bold mb-4 text-primary text-center font-inter">Player List</h2>
         
         <div className="mb-4 flex space-x-4">
           <input
@@ -93,14 +105,14 @@ export const PlayerList = ({ players }: {
             placeholder="Search by ID"
             value={searchId}
             onChange={(e) => setSearchId(e.target.value)}
-            className="flex-1 p-2 bg-gray-700 rounded border border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
+            className="flex-1 p-2 bg-secondary font-inter rounded border border-accent focus:outline-none focus:ring-2 focus:ring-accent transition duration-200"
           />
           <input
             type="text"
             placeholder="Search by Name"
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
-            className="flex-1 p-2 bg-gray-700 rounded border border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
+            className="flex-1 p-2 bg-secondary font-inter rounded border border-accent focus:outline-none focus:ring-2 focus:ring-accent transition duration-200"
           />
         </div>
 
@@ -108,7 +120,7 @@ export const PlayerList = ({ players }: {
           <select
             value={filterState}
             onChange={(e) => setFilterState(e.target.value as 'All' | 'Listed' | 'Not Listed' | 'Sold')}
-            className="p-2 bg-gray-700 rounded border border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
+            className="p-2 bg-secondary rounded border font-inter border-accent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200"
           >
             <option value="All">All Players</option>
             <option value="Listed">Listed</option>
@@ -117,26 +129,26 @@ export const PlayerList = ({ players }: {
           </select>
         </div>
         
-        <table className="w-full border border-green-500">
+        <table className="w-full border border-accent">
           <thead>
-            <tr className="bg-gray-700">
-              <th className="py-2 px-4 text-left text-green-200">Player ID</th>
-              <th className="py-2 px-4 text-left text-green-200">Player Name</th>
-              <th className="py-2 px-4 text-left text-green-200">Base Price</th>
-              <th className="py-2 px-4 text-left text-green-200">State</th>
-              <th className="py-2 px-4 text-left text-green-200">Action</th>
+            <tr className="bg-secondary border-b border-b-accent font-inter font-thin">
+              <th className="py-2 px-4 text-left text-white">Player ID</th>
+              <th className="py-2 px-4 text-left text-white">Player Name</th>
+              <th className="py-2 px-4 text-left text-white">Base Price</th>
+              <th className="py-2 px-4 text-left text-white">State</th>
+              <th className="py-2 px-4 text-left text-white">Action</th>
             </tr>
           </thead>
           <tbody>
             {filteredPlayers.map((player) => (
-              <tr key={player.playerId} className="hover:bg-gray-600 transition duration-200">
-                <td className="py-2 px-4 border-b border-green-500 text-green-100">{player.playerId}</td>
-                <td className="py-2 px-4 border-b border-green-500 text-green-100">{player.playerName}</td>
-                <td className="py-2 px-4 border-b border-green-500 text-green-100">{player.basePrice}</td>
-                <td className={`py-2 px-4 border-b border-green-500 ${getPlayerStateColor(player.playerState)}`}>
+              <tr key={player.playerId} className="hover:bg-primary/50 transition duration-200 font-opensans">
+                <td className="py-2 px-4 border-b border-accent text-white">{player.playerId}</td>
+                <td className="py-2 px-4 border-b border-accent text-white">{player.playerName}</td>
+                <td className="py-2 px-4 border-b border-accent text-white">{player.basePrice}</td>
+                <td className={`py-2 px-4 border-b border-accent ${getPlayerStateColor(player.playerState)}`}>
                   {player.playerState}
                 </td>
-                <td className="py-2 px-4 border-b border-green-500">
+                <td className="py-2 px-4 border-b border-accent">
                   <button
                     className="bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-4 rounded transition duration-200 shadow-lg hover:shadow-xl"
                     onClick={listPlayerHandler(player.playerId, player.playerName, player.basePrice)}
