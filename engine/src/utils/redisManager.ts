@@ -50,9 +50,10 @@ export default class redisManager{
     }
   }
   public async pullQueue():Promise<messagesFromApiType|null>{
-    const res = await this.client.rPop("messagesFromApi" as string);
-    if(res)
-    return JSON.parse(res);
+    console.log("waiting");
+    const res = await this.client.brPop("messagesFromApi",0);
+    if (res && res.key==="messagesFromApi")
+      return JSON.parse(res.element);
     return null
   }
   public async publish(uid:string,msg:string){
