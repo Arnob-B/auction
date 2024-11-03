@@ -4,6 +4,7 @@ import { bidPlacedType, newBidPriceType, newPlayerListedType } from "../types/ws
 import toast,{Toaster} from "react-hot-toast";
 import { adminApi, adminWsApi } from "../keys/adminKeys";
 import { generalApi } from "../keys/generalApi";
+import AdminNavbar from "@/components/AdminNavbar";
 const headerContent = {
   'Content-Type': 'application/json',
 }
@@ -21,32 +22,29 @@ const BanUser = ()=>{
     toast(json.msg);
   }
   return (
-    <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
-      <div className="p-4">
-        <h2 className="text-xl font-bold text-white text-center">Ban User</h2>
-          <div className="mb-4">
-            <label htmlFor="userId" className="block text-white">User ID</label>
+    <div className="max-w-sm mx-auto bg-gradient-to-tr from-white/10 to-white/15 backdrop-blur-md rounded-lg shadow-lg overflow-hidden mt-6 p-4">
+        <h2 className="text-xl font-semibold text-white text-center font-inter">Ban User</h2>
+        <div className="flex gap-x-4 items-center">
             <input
               type="text"
               id="userId"
-              className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring focus:ring-red-500"
+              className="mt-1 block w-full font-opensans bg-gray-700 text-white border border-gray-600 rounded-md px-2 py-1 focus:outline-none focus:ring focus:ring-red-500"
               placeholder="Enter User ID"
               value={userId}
               onChange={e=>{
                 setUserId(e.target.value);
               }}
               required
-            />
-          </div>
+              />
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition duration-200"
+            className="w-fit h-fit bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-700 transition duration-200 font-opensans"
             onClick={banUserHandler}
-          >
-            Ban User
+            >
+            Ban
           </button>
+            </div>
       </div>
-    </div>
   )
 }
 const AddPlayer=()=>{
@@ -68,15 +66,14 @@ const AddPlayer=()=>{
   }
   return(
   <>
-  <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
-  <div className="p-4">
-    <h2 className="text-xl font-bold text-white text-center">Add Player</h2>
-      <div className="mb-4">
+  <div className="w-5/6 bg-gradient-to-tr from-white/10 to-white/15 backdrop-blur-md rounded-lg shadow-lg h-fit mt-8 p-6">
+    <h2 className="text-xl font-semibold font-inter text-white text-center">Add Player</h2>
+      <div className="my-4 font-opensans">
         <label htmlFor="playerId" className="block text-white">Player ID</label>
         <input 
           type="text" 
           id="playerId" 
-          className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500" 
+          className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-md px-2 py-1 focus:outline-none focus:ring focus:ring-blue-500" 
           placeholder="Enter Player ID" 
           value = {id}
           onChange={(e)=>setId(e.target.value)}
@@ -84,8 +81,8 @@ const AddPlayer=()=>{
         />
 
       </div>
-      <div className="mb-4">
-        <label htmlFor="incrementPrice" className="block text-white">Increment Price</label>
+      <div className="mb-4 font-opensans">
+        {/* <label htmlFor="incrementPrice" className="block text-white">Increment Price</label> */}
 
         <label htmlFor="playerName" className="block text-white">Player Name</label>
         <input 
@@ -97,7 +94,7 @@ const AddPlayer=()=>{
           onChange={(e)=>setName(e.target.value)}
           required 
         />
-        <label htmlFor="basePrice" className="block text-white">Base Price</label>
+        <label htmlFor="basePrice" className="block text-white mt-2">Base Price</label>
 
         <input 
           type="number" 
@@ -111,12 +108,11 @@ const AddPlayer=()=>{
       </div>
       <button 
         type="submit" 
-        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+        className="w-full bg-blue-600 text-white py-1 my-2 rounded-md hover:bg-blue-700 transition duration-200 font-opensans"
         onClick={addPlayerHandler}
       >
         Add Player
       </button>
-  </div>
 </div>
 </>
   )
@@ -146,33 +142,28 @@ const PriceControl = () => {
   };
 
   return (
-    <div>
-      <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
-        <div className="p-4">
-          <h2 className="text-xl font-bold text-white text-center">Change Bid Price</h2>
-          <div className="mb-4">
-            <label htmlFor="incrementPrice" className="block text-white">Increment Price</label>
+      <div className="w-[93%] bg-gradient-to-tr from-white/10 to-white/15 backdrop-blur-md rounded-lg shadow-lg overflow-hidden mt-6 p-4">
+          <h2 className="text-xl font-semibold text-white text-center font-inter">Change Bid Price</h2>
+          <div className="flex gap-x-6 items-center justify-around">
             <input
               type="number"
               id="incrementPrice"
-              className="mt-1 block w-full bg-gray-700 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500"
+              className="mt-1 block w-fit h-fit font-opensans bg-gray-700 text-white border border-gray-600 rounded-md px-2 py-1 focus:outline-none focus:ring focus:ring-blue-500"
               placeholder="Enter Increment Price"
               value={price === 0? "" :price }
               onChange={e => setPrice(parseInt(e.target.value) || 0)} // Ensure default to 0 if NaN
               step={10}
               required
             />
-          </div>
           <button
             type="button" // Change type to "button"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            className="w-fit font-opensans h-fit bg-blue-600 text-white py-1 px-2 rounded-md hover:bg-blue-700 transition duration-200"
             onClick={priceChangeHandler}
-          >
+            >
             Set Price
           </button>
+            </div>
         </div>
-      </div>
-    </div>
   );
 };
 const BidProfile = ({playerDetails}:{playerDetails:{
@@ -183,10 +174,9 @@ const BidProfile = ({playerDetails}:{playerDetails:{
     nextPrice:number
 }}) => {
   return (
-    <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
-      <div className="p-4">
-        <h2 className="text-xl font-bold text-white text-center">Bid Profile</h2>
-        <div className="mt-4">
+    <div className="w-full justify-self-center bg-gradient-to-tr from-white/10 to-white/15 backdrop-blur-md rounded-lg shadow-lg mt-6 p-4">
+        <h2 className="text-xl font-semibold text-white text-center font-inter">Bid Profile</h2>
+        <div className="mt-4 flex flex-col gap-2 font-opensans">
           <p className="text-white">Player ID: <span className="font-semibold">{playerDetails.playerId}</span></p>
           <p className="text-white">Player Name: <span className="font-semibold">{playerDetails.playerName}</span></p>
           <p className="text-white">Base Price: <span className="font-semibold text-green-400">{playerDetails.basePrice}</span></p>
@@ -194,7 +184,6 @@ const BidProfile = ({playerDetails}:{playerDetails:{
           <p className="text-white">Next Bid Price: <span className="font-semibold text-green-400">{playerDetails.nextPrice}</span></p>
         </div>
       </div>
-    </div>
   )
 }
 const BidControl = () => {
@@ -226,10 +215,9 @@ const BidControl = () => {
     toast(json.msg);
   }
   return (
-    <div className="max-w-sm mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6">
-      <div className="p-4">
-        <h2 className="text-xl font-bold text-white text-center">Bid Control Panel</h2>
-        <div className="mt-6 flex flex-col space-y-4">
+    <div className="w-4/5 bg-gradient-to-tr from-white/10 to-white/15 backdrop-blur-md rounded-lg shadow-lg overflow-hidden mt-6 p-4">
+        <h2 className="text-xl font-semibold text-white text-center font-inter">Bid Control Panel</h2>
+        <div className="mt-6 flex flex-col space-y-4 font-opensans">
           <button
             className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200"
             onClick={onStartHandler}
@@ -250,7 +238,6 @@ const BidControl = () => {
           </button>
         </div>
       </div>
-    </div>
   )
 }
 export default function Page() {
@@ -287,12 +274,12 @@ export default function Page() {
         setInterval(()=>{
           wsClient.send("ping");
         },50000)
-        setIsLive(prev => {
+        setIsLive(() => {
           return true;
         })
       }
       wsClient.onclose = () => {
-        setIsLive(prev => {
+        setIsLive(() => {
           return false;
         })
       }
@@ -344,6 +331,8 @@ export default function Page() {
   },[]);
   return (
     <>
+    <div className="min-h-screen w-[98vw] relative flex flex-col sm:flex-row justify-center p-16">
+      <AdminNavbar />
       <Toaster
         position="bottom-left"
         reverseOrder={false}
@@ -370,20 +359,25 @@ export default function Page() {
         }}
       />
       <LiveButton isLive={isLive}></LiveButton>
-      <BidProfile playerDetails={playerDetails}></BidProfile>
-      <BidControl></BidControl>
-      <PriceControl></PriceControl>
-      <AddPlayer></AddPlayer>
-      <BanUser></BanUser>
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 place-items-center">
+        <BidProfile playerDetails={playerDetails} />
+        <BidControl/>
+        <PriceControl/>
+        <BanUser/>
+      </div>
+      <div className="sm:w-1/2 flex justify-center mt-4">
+        <AddPlayer/>
+      </div>
+          </div>
     </>
   )
 }
 
-function LiveButton({ isLive }) {
+function LiveButton({ isLive }:{isLive:boolean}) {
   return (
     <button
-      className={`px-6 py-2 font-bold text-white rounded-md relative 
-        ${isLive ? 'bg-red-500 animate-pulse neon-shadow' : 'bg-gray-400'}
+      className={`px-6 py-2 font-bold fixed top-8 left-8 text-white rounded-md font-opensans
+        ${isLive ? 'bg-red-500 neon-shadow' : 'bg-gray-400/20'}
       `}
       style={{
         transition: 'all 0.3s ease-in-out',
@@ -396,7 +390,7 @@ function LiveButton({ isLive }) {
             0 0 5px #ff1a1a, 
             0 0 10px #ff1a1a, 
             0 0 20px #ff1a1a, 
-            0 0 40px #ff1a1a;
+            0 0 30px #ff1a1a;
         }
       `}</style>
     </button>

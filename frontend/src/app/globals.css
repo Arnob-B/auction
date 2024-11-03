@@ -22,3 +22,24 @@ body {
     text-wrap: balance;
   }
 }
+
+.spinner_d9Sa {
+	transform-origin: center;
+}
+.spinner_qQQY {
+	animation: spinner_ZpfF 10s linear infinite;
+}
+.spinner_pote {
+	animation: spinner_ZpfF 1.5s linear infinite;
+}
+@keyframes spinner_ZpfF {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.mobile-player-card{
+  background-image: linear-gradient(#3c096c20,#3c096c95,#3c096c), url("https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/C._Ronaldo_-_Ballon_d%27Or_2014.jpg/261px-C._Ronaldo_-_Ballon_d%27Or_2014.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
