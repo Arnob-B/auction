@@ -44,6 +44,7 @@ route.post('/banUser',async (req,res)=>{
 });
 
 //@ts-ignore
+/*
 route.post("/addUser",async(req,res)=>{
   const { userId,userName,balance} = req.body;
   if (userId !== undefined && userName !==undefined && balance !==undefined) {
@@ -56,6 +57,7 @@ route.post("/addUser",async(req,res)=>{
   }
   else res.json({ msg: "failed" });
 });
+*/
 
 route.post("/sellPlayer",async(req,res)=>{
   console.info("SELLPLAYER");
