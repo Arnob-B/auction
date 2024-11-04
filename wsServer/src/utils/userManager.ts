@@ -15,6 +15,7 @@ export default class userManager{
     const rand:string = this.getRandom();
     this.allUsers.set(rand,new User(socket,rand));
     console.log("user added ",rand);
+    console.info(`users: ${userManager.getInstance().allUsers.size} admins:${userManager.getInstance().allAdmin.size}`);
     socket.onclose = ()=>{
       this.delId(rand);
       console.log(`user ${rand} closed`);
@@ -24,6 +25,7 @@ export default class userManager{
     const rand:string = this.getRandom();
     this.allAdmin.set(rand,new User(socket,rand));
     console.log("admin added ",rand);
+    console.info(`users: ${userManager.getInstance().allUsers.size} admins:${userManager.getInstance().allAdmin.size}`);
     socket.onclose = ()=>{
       this.delId(rand);
       console.log(`admin ${rand} closed`);
