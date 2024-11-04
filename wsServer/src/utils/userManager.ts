@@ -15,17 +15,19 @@ export default class userManager{
     const rand:string = this.getRandom();
     this.allUsers.set(rand,new User(socket,rand));
     console.log("user added ",rand);
+<<<<<<< HEAD
     console.info(`users: ${userManager.getInstance().allUsers.size} admins:${userManager.getInstance().allAdmin.size}`);
     socket.onclose = ()=>{
       this.delId(rand);
       console.log(`${rand} closed`);
     }
+=======
+>>>>>>> parent of 7c2e170 (wsServer user count logs added)
   }
   public addAdmin(socket:WebSocket){
     const rand:string = this.getRandom();
     this.allAdmin.set(rand,new User(socket,rand));
     console.log("admin added ",rand);
-    console.info(`users: ${userManager.getInstance().allUsers.size} admins:${userManager.getInstance().allAdmin.size}`);
   }
   public delId(id:string){
     this.allUsers.delete(id);
