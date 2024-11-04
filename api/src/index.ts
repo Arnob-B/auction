@@ -15,7 +15,10 @@ const corsOption = {
 }
 app.use(cors(corsOption));
 app.use("/admin",adminRoute);
+
 app.get("/getCurrentPlayer",async (req, res)=>{
+  console.log("GET PLAYER");
+  const clientId = redisManager.getInstance().getRandom();
   const response = await redisManager.getInstance().sendAndAwait({
     type: getCurrentPlayer,
     clientId: redisManager.getInstance().getRandom()
@@ -25,6 +28,7 @@ app.get("/getCurrentPlayer",async (req, res)=>{
 
 app.post('/bid',async(req,res)=>{
   const {playerId, bidderId, amnt}= req.body;
+  console.info("POST BID");
   if(playerId !==undefined && bidderId !== undefined && amnt !== undefined)
   {
     const response = await redisManager.getInstance().sendAndAwait({
@@ -39,8 +43,9 @@ app.post('/bid',async(req,res)=>{
     res.json({ msg: response });
   }
   else {
+    console.warn(`${playerId}|${bidderId}|${amnt}`);
     res.json({ msg: "failed" });
-}
+  }
 });
 app.listen(3000, ()=>{
   console.log("application started at 3000");

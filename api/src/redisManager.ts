@@ -36,9 +36,11 @@ export default class redisManager{
   }
   public async sendAndAwait({ type, body ,clientId}: messagesFromApiType): Promise<string> {
     return new Promise(async (resolve)=>{
+      console.log(`sub ${clientId}`);
       try {
         this.subscriber.subscribe(clientId, (message) => {
           this.subscriber.unsubscribe(clientId);
+          console.info(`resolved ${clientId}`);
           resolve(message);
         });
         await this.client.lPush("messagesFromApi", JSON.stringify({
@@ -48,7 +50,7 @@ export default class redisManager{
         }));
       }
       catch (err) {
-        console.log(err);
+        console.error(err);
         resolve("failed");
         return;
       }
@@ -56,7 +58,6 @@ export default class redisManager{
   }
   public getRandom(){
     const rand =  Math.random().toString(36).substring(2,);
-    console.log(rand)
     return rand;
   }
 

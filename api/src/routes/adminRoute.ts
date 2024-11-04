@@ -4,7 +4,9 @@ import { Router } from "express";
 import { changeNextPrice } from "../types/streamType";
 import { setControl } from "../types/streamType";
 const route=Router();
+
 route.post('/addPlayer',async(req,res)=>{
+  console.info("ADD PLAYER");
   const {id,name,basePrice} = req.body;
   if(id !==undefined && name !==undefined && basePrice !==undefined){
     const response = await redisManager.getInstance().sendAndAwait({
@@ -19,11 +21,13 @@ route.post('/addPlayer',async(req,res)=>{
     res.json({ msg: response });
   }
   else{
+    console.warn(`${id}|${name}|${basePrice}`);
     res.json({ msg: "failed" });
   }
 });
 //@ts-ignore
 route.post('/banUser',async (req,res)=>{
+  console.info('BANUSER');
   const { userId } = req.body;
   if (userId !== undefined) {
     const response = await redisManager.getInstance().sendAndAwait({
@@ -33,7 +37,10 @@ route.post('/banUser',async (req,res)=>{
     });
     return res.json({ msg: response });
   }
-  else res.json({ msg: "failed" });
+  else {
+    console.warn(`${userId}`);
+    res.json({ msg: "failed" });
+  }
 });
 
 //@ts-ignore
@@ -51,6 +58,7 @@ route.post("/addUser",async(req,res)=>{
 });
 
 route.post("/sellPlayer",async(req,res)=>{
+  console.info("SELLPLAYER");
   const response = await redisManager.getInstance().sendAndAwait({
     type:sellPlayer,
     clientId: redisManager.getInstance().getRandom()
@@ -59,6 +67,7 @@ route.post("/sellPlayer",async(req,res)=>{
 })
 
 route.post("/changeNextPrice",async(req,res)=>{
+  console.info("CHANGENEXTPRICE");
   if(typeof(req.body.incrementPrice) === "number")
   {
     const response = await redisManager.getInstance().sendAndAwait({
@@ -68,9 +77,13 @@ route.post("/changeNextPrice",async(req,res)=>{
     })
     res.json({ msg: response });
   }
-  else res.json({msg:"failed"});
+  else {
+    console.warn(`${req.body.incrementPrice}`);
+    res.json({msg:"failed"});
+  }
 });
 route.post("/controls",async(req,res)=>{
+  console.info("CONTROL");
   if(req.body.state === "START" || req.body.state === "STOP") {
     const response = await redisManager.getInstance().sendAndAwait({
       type: setControl,
@@ -81,8 +94,10 @@ route.post("/controls",async(req,res)=>{
     })
     res.json({ msg: response });
   }
-  else 
+  else{
+    console.warn(`${req.body.state}`);
     res.json({ msg: "failed" });
+  }
 });
 
 export default route;
