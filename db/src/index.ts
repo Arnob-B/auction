@@ -13,10 +13,11 @@ const main = async () => {
   await client.connect();
   console.log("REDIS client setup done");
   while (true) {
-    console.log("awaiting");
+    console.log("----awaiting----");
     const msg = await client.brPop("DBMESSAGE" as string,0);
     if (msg && msg.key === "DBMESSAGE") {
       const res:dbMessageType = JSON.parse(msg.element);
+      console.info(res.type);
       switch (res.type) {
         case newPlayerListedType: {
           await dbManager.getInstance().playerListed(res.body.playerId);
