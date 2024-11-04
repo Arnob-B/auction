@@ -16,6 +16,10 @@ export default class userManager{
     this.allUsers.set(rand,new User(socket,rand));
     console.log("user added ",rand);
     console.info(`users: ${userManager.getInstance().allUsers.size} admins:${userManager.getInstance().allAdmin.size}`);
+    socket.onclose = ()=>{
+      this.delId(rand);
+      console.log(`${rand} closed`);
+    }
   }
   public addAdmin(socket:WebSocket){
     const rand:string = this.getRandom();
@@ -23,8 +27,9 @@ export default class userManager{
     console.log("admin added ",rand);
     console.info(`users: ${userManager.getInstance().allUsers.size} admins:${userManager.getInstance().allAdmin.size}`);
   }
-  public delUser(id:string){
+  public delId(id:string){
     this.allUsers.delete(id);
+    this.allAdmin.delete(id);
   }
   public emitAdmin(msg:string){
     this.allAdmin.forEach(e=>e.sendMsg(msg));
