@@ -1,2 +1,2 @@
-export const adminApi = "http://auckipl.duckdns.org/api/admin"
-export const adminWsApi = "http://auckipl.duckdns.org/adminWs"
+export const adminApi = "https://backend1.juecell.com/api/admin"
+export const adminWsApi = "https://backend1.juecell.com/adminWs"

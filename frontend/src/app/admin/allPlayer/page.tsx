@@ -1,10 +1,11 @@
-import { playerState, PrismaClient } from "@prisma/client";
+import { playerState } from "@prisma/client";
 import { PlayerList } from "./PlayerListComponent";
+import {prisma} from "@/utils/db";
 
 export default async function  Page(){
-  const client = new PrismaClient();
+  // const client = new PrismaClient();
   const players = [];
-  const res = await client.player.findMany();
+  const res = await prisma.player.findMany();
   for(const a of res){
     let state: 'Listed' | 'Not Listed' | 'Sold'; 
     switch (a.state){

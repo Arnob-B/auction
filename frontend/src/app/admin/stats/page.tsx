@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import { bidPlacedType } from "../../types/wsPSubStreamTypes";
 import { adminWsApi } from "@/app/keys/adminKeys";
 import AdminNavbar from "@/components/AdminNavbar";
+import LiveButton from "@/components/Bidder/LiveButton";
 
 
 const LeaderBoard = ({ bidders }:{
@@ -71,8 +72,16 @@ export default function Page(){
     amount: number
   }>>([]);
 
+  const [isLive, setIsLive] = useState<boolean>(false);
+
   useEffect(()=>{
     const wsClient = new WebSocket(adminWsApi);
+    wsClient.onopen = () => {
+      setIsLive(true);
+      setInterval(()=>{
+        wsClient.send("ping");
+      },50000);
+    }
     wsClient.onmessage=message=>{
       try {
         const msg = message.data;
@@ -100,7 +109,10 @@ export default function Page(){
   },[]);
   return (
     <>
+    <div className="h-screen w-screen relative">
+      <LiveButton isLive={isLive}/>
     <LeaderBoard bidders={bidderList}></LeaderBoard>
+    </div>
     </>
   )
 }

@@ -18,12 +18,15 @@ import NoPlayerListed from "@/components/Bidder/NoPlayerListed";
 // import Card from "./Card";
 import LeaderBoard from "@/components/Bidder/Leaderboard";
 import AlertBox from "@/components/Bidder/AlertBox";
+// import Image from "next/image";
+import getPlayerImageLink from "./getPlayerImage";
 
 type playerDetailsType = {
 	id: string;
 	name: string;
 	basePrice: number;
 	currentPrice: number;
+	imgLink: string;
 };
 
 function PlaceBid({
@@ -71,7 +74,7 @@ function PlaceBid({
 function SmallCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsType,nextBid:number,userId:string}) {
   return (
     <div className="col-span-2 flex flex-col sm:flex-row gap-8 pt-4 px-8">
-      <div className="h-[75vh] mobile-player-card flex flex-col justify-end">
+      <div className="h-[75vh] flex flex-col justify-end" style={{backgroundImage: `linear-gradient(#3c096c20,#3c096c95,#3c096c), url('${playerDetails.imgLink}')`, backgroundRepeat: "no-repeat", backgroundSize: "cover"}}>
       <div className="w-full flex flex-col gap-y-6 justify-center px-3">
         <h1 className="text-3xl font-inter font-medium">{playerDetails.name}</h1>
         {/* <h2 className="text-lg font-inter my-4">Player Id: {playerDetails.id}</h2> */}
@@ -98,9 +101,10 @@ function LargeCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsTy
       <div className="h-[75vh]">
       <img
 				className="h-full w-auto object-cover"
-				src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/C._Ronaldo_-_Ballon_d%27Or_2014.jpg/261px-C._Ronaldo_-_Ballon_d%27Or_2014.jpg"
+				src={playerDetails.imgLink}
 				alt={`${playerDetails.name} Image`}
 			/>
+			{/* <Image src={playerDetails.imgLink} alt={`${playerDetails.name} Image`} width={400} height={400} className="h-full w-auto object-cover"/> */}
       </div>
       <div className="w-1/2 flex flex-col gap-y-6 justify-center pl-6">
         <h1 className="text-[2.75rem] font-inter font-medium">{playerDetails.name}</h1>
@@ -127,6 +131,7 @@ export default function ClientCode({userId}:{userId:string}) {
 		name: "",
 		basePrice: 0,
 		currentPrice: 0,
+		imgLink: "",
 	});
 	const [bidderList, setBidderList] = useState<[string, number][]>([]);
 	const [nextBid, setNextBid] = useState<number>(0);
@@ -153,11 +158,13 @@ export default function ClientCode({userId}:{userId:string}) {
 			const res = await fetch(generalApi + "/getCurrentPlayer");
 			const body = await res.json();
 			const data = body.msg;
+			const playerImage = await getPlayerImageLink(data.id);
 			setPlayerDetails({
 				id: data.id,
 				name: data.name,
 				basePrice: data.basePrice,
 				currentPrice: data.currentPrice,
+				imgLink: playerImage.imgLink
 			});
 			setNextBid(data.nextBid);
 
@@ -171,17 +178,19 @@ export default function ClientCode({userId}:{userId:string}) {
 			wsClient.onclose = () =>{
 				setIsLive(()=> false);
 			}
-			wsClient.onmessage = (message) => {
+			wsClient.onmessage = async (message) => {
 				const msg = JSON.parse(message.data);
 				const body = msg.body;
+				const playerImage = await getPlayerImageLink(body.playerId);
 				switch (msg.type) {
 					case newPlayerListedType: {
-						toast.success("New player is listed");
+						toast.success("New player is listed!");
 						setPlayerDetails({
 							id: body.playerId,
 							name: body.playerName,
 							basePrice: body.basePrice,
 							currentPrice: body.currentPrice,
+							imgLink: playerImage.imgLink
 						});
 						setNextBid(body.currentPrice);
 						break;
@@ -196,7 +205,7 @@ export default function ClientCode({userId}:{userId:string}) {
 								};
 							} else {
 								//get the latest user
-								alert("Reload this page as player is not up to date");
+								alert("Reload this page! Player is not up to date");
 								return prev;
 							}
 						});
@@ -206,11 +215,11 @@ export default function ClientCode({userId}:{userId:string}) {
 						break;
 					}
 					case newBidPriceType: {
-						toast("new price is set");
+						toast("New price is set");
 						setPlayerDetails((prev) => {
 							if (prev.id === body.playerId) setNextBid(body.nextPrice);
 							else {
-								alert("Reload this page as player is not up to date");
+								alert("Reload this page! Player is not up to date");
 							}
 							return prev;
 						});
@@ -244,7 +253,7 @@ export default function ClientCode({userId}:{userId:string}) {
 	}, []);
 	// console.log(">_<");
 	// console.log(playerDetails);
-	if (playerDetails.id === "") return <NoPlayerListed />;
+	if (playerDetails.id === "") return <NoPlayerListed isLive={isLive} />;
 	return (
 		<div className="max-w-screen h-screen flex flex-col items-center relative py-8 sm:py-0">
 			<UserNavbar />
@@ -259,7 +268,9 @@ export default function ClientCode({userId}:{userId:string}) {
 					className: "",
 					duration: 5000,
 					style: {
-						background: "#9d4edd",
+						background: "#9d4edd20",
+						opacity: 50,
+						backdropFilter: "blur(12px)",
 						color: "#fff",
 					},
 

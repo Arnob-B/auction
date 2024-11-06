@@ -1,9 +1,13 @@
 import Image from "next/image";
 import UserNavbar from "@/components/UserNavbar";
+import LiveButton from "./LiveButton";
+// import React, {useState} from "react";
 
-function NoPlayerListed(){
+function NoPlayerListed({isLive}:{isLive:boolean}){
+    // const [isLive, setIsLive] = useState<boolean>(false);
 	return(
     <div className='h-screen w-screen grid place-items-center relative'>
+        <LiveButton isLive={isLive}/>
 		<UserNavbar />
         <div className='text-center flex flex-col gap-y-8 font-inter'>
             <div className='flex flex-col items-center justify-center sm:flex-row sm:gap-12'>

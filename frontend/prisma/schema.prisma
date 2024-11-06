@@ -34,6 +34,7 @@ enum playerState {
 model Player {
   id        String      @id @unique
   name      String
+  imgLink   String
   basePrice Int
   state     playerState @default(NOTLISTED)
 }
