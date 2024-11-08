@@ -5,10 +5,10 @@ import ClientCode from './ClientCode';
 
 async function page() {
 	const session = await auth();
-	// console.log(session);
-	if(!session || !session.user || !session.user.id) redirect("/");
+	// console.log({session});
+	if(!session || !session.user || !session.user.id || !session.user.name) redirect("/");
   return (
-	<ClientCode userId={session.user.id}/>
+	<ClientCode userId={session.user.id} userName={session.user.name} />
   )
 }
 

@@ -1,6 +1,6 @@
 export default function LeaderBoard({ bidderList }: { bidderList: [string, number][] }) {
 	return (
-		<div className="bg-gradient-to-tr from-white/5 via-white/5 to-white/10 backdrop-blur-md rounded-lg shadow-lg overflow-hidden mt-6">
+		<div className="bg-gradient-to-tr from-white/5 via-white/5 h-fit to-white/10 backdrop-blur-md rounded-lg shadow-lg overflow-hidden mt-6">
 			<div className="p-4 border-b border-gray-700">
 				<h2 className="text-xl font-semibold font-inter text-white text-center">
 					Bidding Leaderboard

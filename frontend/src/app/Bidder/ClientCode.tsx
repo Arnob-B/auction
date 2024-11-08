@@ -12,13 +12,10 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { generalApi, generalWsApi } from "../keys/generalApi";
 import UserNavbar from "@/components/UserNavbar";
-// import { BlobOptions } from "buffer";
 import LiveButton from "@/components/Bidder/LiveButton";
 import NoPlayerListed from "@/components/Bidder/NoPlayerListed";
-// import Card from "./Card";
 import LeaderBoard from "@/components/Bidder/Leaderboard";
 import AlertBox from "@/components/Bidder/AlertBox";
-// import Image from "next/image";
 import getPlayerImageLink from "./getPlayerImage";
 
 type playerDetailsType = {
@@ -73,8 +70,8 @@ function PlaceBid({
 
 function SmallCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsType,nextBid:number,userId:string}) {
   return (
-    <div className="col-span-2 flex flex-col sm:flex-row gap-8 pt-4 px-8">
-      <div className="h-[75vh] flex flex-col justify-end" style={{backgroundImage: `linear-gradient(#3c096c20,#3c096c95,#3c096c), url('${playerDetails.imgLink}')`, backgroundRepeat: "no-repeat", backgroundSize: "cover"}}>
+    <div className="flex flex-col md:flex-row gap-8 px-8 md:hidden">
+      <div className="h-[75vh] flex flex-col justify-end" style={{backgroundImage: `linear-gradient(#3c096c20,#3c096c95,#3c096c), url('${playerDetails.imgLink}')`, backgroundRepeat: "no-repeat", backgroundSize: "cover", backgroundPosition: "center"}}>
       <div className="w-full flex flex-col gap-y-6 justify-center px-3">
         <h1 className="text-3xl font-inter font-medium">{playerDetails.name}</h1>
         {/* <h2 className="text-lg font-inter my-4">Player Id: {playerDetails.id}</h2> */}
@@ -97,7 +94,7 @@ function SmallCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsTy
 
 function LargeCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsType,nextBid:number,userId:string}) {
   return (
-    <div className="col-span-2 flex flex-col sm:flex-row gap-8 pt-4 px-8">
+    <div className="md:flex flex-col md:flex-row gap-8 px-8 hidden">
       <div className="h-[75vh]">
       <img
 				className="h-full w-auto object-cover"
@@ -125,7 +122,7 @@ function LargeCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsTy
   )
 }
 
-export default function ClientCode({userId}:{userId:string}) {
+export default function ClientCode({userId, userName}:{userId:string, userName:string}) {
 	const [playerDetails, setPlayerDetails] = useState<playerDetailsType>({
 		id: "",
 		name: "",
@@ -147,17 +144,34 @@ export default function ClientCode({userId}:{userId:string}) {
 		amount: 0,
 	});
 	const [isLive, setIsLive] = useState<boolean>(false);
+	const [userBalance, setUserBalance] = useState<number>(0);
 
 	const handleClose = () => {
 		setIsOpen((prev) => {
 			return { ...prev, state: false };
 		});
 	};
+
+	const updateBalance = () => {
+		fetch(`api/user/getBalance/${userId}`, 
+			{next: { 
+				revalidate: 300
+			}})
+			.then(res=>res.json())
+			.then(res=>setUserBalance(res.balance));
+	}
+
 	useEffect(() => {
 		const main = async () => {
 			const res = await fetch(generalApi + "/getCurrentPlayer");
 			const body = await res.json();
 			const data = body.msg;
+			fetch(`api/user/getBalance/${userId}`, 
+				{next: { 
+					revalidate: 300
+				}})
+				.then(res=>res.json())
+				.then(res=>setUserBalance(res.balance));
 			const playerImage = await getPlayerImageLink(data.id);
 			setPlayerDetails({
 				id: data.id,
@@ -230,7 +244,8 @@ export default function ClientCode({userId}:{userId:string}) {
 						break;
 					}
 					case playerSoldType: {
-						console.log(body);
+						console.log("Body: ",{body});
+
 						setIsOpen(() => {
 							return {
 								state: true,
@@ -293,13 +308,35 @@ export default function ClientCode({userId}:{userId:string}) {
 				/>
 			)}
 			<LiveButton isLive={isLive}></LiveButton>
-			<div className="w-full sm:w-5/6 grid grid-cols-1 sm:grid-cols-3 gap-12 mt-24">
-      {window.innerWidth<=640? <SmallCard playerDetails={playerDetails} nextBid={nextBid} userId={userId}/> : 
-			<LargeCard playerDetails={playerDetails} nextBid={nextBid} userId={userId}/>
-      }
-      <div className="w-screen sm:w-full flex justify-center mb-8 sm:mb-0">
-			<LeaderBoard bidderList={bidderList}></LeaderBoard>
-      </div>
+			<div className="h-full w-full flex flex-col items-center">
+				<div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-8 mt-24 px-2">
+					<div className="w-full h-full col-span-2">
+				<div className="flex flex-col md:flex-row justify-end gap-x-6 gap-y-2 w-full sm:pr-8 my-2 font-inter">
+					<div className="flex gap-6 justify-center">
+					<p className="sm:text-xl">
+					Welcome, {userName} 
+					</p>
+					<p className="sm:text-xl">
+					Balance: {userBalance}{" "}
+					</p>
+					</div>
+					<button onClick={updateBalance} className="bg-primary px-4 py-1 text-sm rounded-sm w-fit self-center">Refresh Balance</button>
+				</div>
+					<SmallCard
+						playerDetails={playerDetails}
+						nextBid={nextBid}
+						userId={userId}
+						/>
+					<LargeCard
+						playerDetails={playerDetails}
+						nextBid={nextBid}
+						userId={userId}
+						/>
+						</div>
+					<div className="w-screen sm:w-full flex justify-center mb-8 sm:mb-0">
+						<LeaderBoard bidderList={bidderList}></LeaderBoard>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

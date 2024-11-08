@@ -23,6 +23,7 @@ model User {
   name     String
   password String
   role     String
+  balance  Int
 }
 
 enum playerState {
