@@ -1,0 +1,68 @@
+@keyframes flipOutLeft {
+  0% {
+    transform: translateX(0) rotateY(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-100%) rotateY(90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-100%) rotateY(180deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flipOutRight {
+  0% {
+    transform: translateX(0) rotateY(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(100%) rotateY(-90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(100%) rotateY(-180deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flipInRight {
+  0% {
+    transform: translateX(100%) rotateY(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-10%) rotateY(-90deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes flipInLeft {
+  0% {
+    transform: translateX(-100%) rotateY(180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(10%) rotateY(90deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+/* Apply the correct flip animation based on direction */
+.animate-flip-right {
+  animation: flipOutLeft 0.5s ease-in-out forwards, flipInRight 0.5s ease-in-out forwards;
+}
+
+.animate-flip-left {
+  animation: flipOutRight 0.5s ease-in-out forwards, flipInLeft 0.5s ease-in-out forwards;
+}
