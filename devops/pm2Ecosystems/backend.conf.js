@@ -10,7 +10,7 @@ module.exports = {
           },
           {
                   name:'engine',
-                  script: 'node engine/build/index.js',
+                  script: 'cd engine && node build/index.js',
                   env:{
                           DATABASE_URL :"" ,
                           CLIENT_URL : "",
