@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AiOutlineLeft, AiOutlineRight, AiOutlinePlayCircle, AiOutlinePauseCircle } from 'react-icons/ai';
 import { MdSportsSoccer } from 'react-icons/md';
 
-import { playersType } from './myPlayer/page';
+import { playersType } from './page';
 
 export default function MyTeam({players}:{players:Array<playersType>}) {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -14,13 +14,12 @@ export default function MyTeam({players}:{players:Array<playersType>}) {
 
   // Carousel auto-play effect
   useEffect(() => {
-    let interval:any;
     if (isPlaying) {
-      interval = setInterval(() => {
+      const interval = setInterval(() => {
         handleNext();
       }, 1000);
+      return () => clearInterval(interval);
     }
-    return () => clearInterval(interval);
   }, [isPlaying, currentPlayerIndex]);
 
   const handleNext = () => {
@@ -41,7 +40,7 @@ export default function MyTeam({players}:{players:Array<playersType>}) {
     setIsPlaying((prev) => !prev);
   };
 
-  const triggerFlipAnimation = (callback) => {
+  const triggerFlipAnimation = (callback:()=>void) => {
     setIsFlipping(true);
     setTimeout(() => {
       callback();
