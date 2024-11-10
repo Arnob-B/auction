@@ -7,6 +7,7 @@ import { userManager } from "./userManager";
 import dotenv from "dotenv"
 dotenv.config();
 
+import fs from 'fs';
 export class engineManager{
   private static instance:engineManager;
   private bidContinue:boolean;
@@ -20,6 +21,30 @@ export class engineManager{
   private async init(){
     await redisManager.getInstance();
     await this.addAllUser();
+    //getting the snapshot 
+    if(process.env.BUILD_BACKUP && parseInt(process.env.BUILD_BACKUP))
+    { console.log("initiating startup from backup");
+    try{
+      const data = fs.readFileSync('./backup/playerSnapshot.json', { encoding: 'utf-8', flag: 'r' });
+      if (data) {
+        console.log("data present in snapshot");
+        const playerDetails = JSON.parse(data);
+        player.getInstance().id = playerDetails.id;
+        player.getInstance().name = playerDetails.name;
+        player.getInstance().basePrice = playerDetails.basePrice;
+        player.getInstance().currentPrice = playerDetails.currentPrice;
+        player.getInstance().incrementPrice = playerDetails.incrementPrice;
+        player.getInstance().currentWinningBidder = playerDetails.currentWinningBidder;
+        player.getInstance().nextPrice = playerDetails.nextPrice;
+        console.log("player added from snapshot");
+      }
+      else console.log("no data in snapshot");
+    }
+    catch(e){
+      console.log("no snapshots found");
+    }
+  }
+    //
     this.runEngine();
   }
   public static getInstance(){
@@ -57,10 +82,18 @@ export class engineManager{
     console.log(userManager.getInstance().allUsers.length);
     console.log(userManager.getInstance().bannedUser.length);
   }
-  public testCheck(){
-    userManager.getInstance().allUsers.forEach((a)=>{
-      console.log(a.getDetails().userId,a.getDetails().playerCount);
-    })
+  public takeSnapshot(){
+    const playerData = {
+      id: player.getInstance().id,
+      name: player.getInstance().name,
+      basePrice: player.getInstance().basePrice,
+      currentPrice: player.getInstance().currentPrice,
+      incrementPrice: player.getInstance().incrementPrice,
+      currentWinningBidder: player.getInstance().currentWinningBidder,
+      nextPrice: player.getInstance().nextPrice,
+    }
+    fs.writeFileSync('./backup/playerSnapshot.json', JSON.stringify(playerData));
+    console.log("snapshot taken");
   }
   public async publishToApi(clientId:string,msg:string){
     await redisManager.getInstance().publish(clientId,msg);
@@ -93,6 +126,7 @@ export class engineManager{
         {
           if(!this.bidContinue) {redisManager.getInstance().publish(msg.clientId,"Biddin is paused for now");break;}
           const responseToApi = await this.placeBid(msg.body);
+          //snapshot will be included in the placeBid function
           this.publishToApi(msg.clientId, responseToApi);
           break;
         }
@@ -134,6 +168,7 @@ export class engineManager{
   public async listPlayer(body:addPlayerBody):Promise<string>{
     const msg = player.getInstance().setPlayer(body);
     if (msg !== "playerAlreadyInBid") {
+      this.takeSnapshot();
       const obj = player.getInstance();
       const response:newPlayerListed = {
         type: "NEW_PLAYER_LISTED",
@@ -173,6 +208,11 @@ export class engineManager{
               // updating the player 
               player.getInstance().currentPrice = bidAmnt;
               player.getInstance().nextPrice = player.getInstance().currentPrice + player.getInstance().incrementPrice;
+
+              //saving player into the file
+              this.takeSnapshot();
+
+              //
               const response:bidPlaced = {
                 type:"BID_PLACED",
                 body:{
@@ -249,6 +289,7 @@ export class engineManager{
       playerName: "",
       playerBasePrice: 0
     });
+    this.takeSnapshot();
     //publish to ws pub sub
     await redisManager.getInstance().publishToWs(response);
     //db call with player remaining unsold
