@@ -15,8 +15,11 @@ module.exports = {
                           DATABASE_URL :"" ,
                           CLIENT_URL : "",
                           DBQUEUE_URL : "",
-                          PUBLISH_URL : ""
-                  }
+                          PUBLISH_URL : "",
+                          MAX_HOLD: 3,
+                          BUILD_BACKUP :1
+                  },
+                  autorestart:false
           },
           {
                   name:'wsServer',
@@ -31,7 +34,8 @@ module.exports = {
                   env:{
                           DATABASE_URL:"",
                           CLIENT_URL : ""
-                  }
+                  },
+                  autorestart:false
           },
   ],
 };
