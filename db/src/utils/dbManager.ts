@@ -10,6 +10,8 @@ export default class dbManager{
     if(this.instance) return this.instance
     else return this.instance = new dbManager();
   }
+
+
   public async  playerListed(playerId:string){
     try{
       const res = await this.client.player.update(
@@ -26,71 +28,63 @@ export default class dbManager{
       console.error(`player listing error -> \n${err}\n----------`);
     }
   }
-  public async playerSold(playerId:string,bidderId:string, amount:number){
+  public async playerSold(playerId: string, bidderId: string, amount: number) {
     if (bidderId === "" || playerId === "") {
-      if (playerId === "") {console.warn("playerId null returning");return;}
+      if (playerId === "") { console.warn("playerId null returning"); return; }
+      //no-one bought the player
       try {
         console.log(`empty sell initiated`);
-        const res = await this.client.player.update(
-          {
+        const res = await this.client.player.update({
             where: { id: playerId },
-            data: {
-              state: playerState.SOLD
-            }
-          }
-        )
+            data: {state: playerState.SOLD}
+          })
         console.log(`marked as sold`);
       }
-      catch (err) {
-        console.error(`empty player sell  error -> \n${err}\n----------`);
-      } return;
+      catch (err) {console.error(`empty player sell  error -> \n${err}\n----------`);}
+      return;
     }
-    let userBalance = null
-    try{
-      userBalance = await this.client.user.findFirst({
-        where: {
-          id: bidderId
-        },
-        select: {
-          balance: true
-        }
-      });
-      console.log("bal withdraw success");
-    } catch (err) {
-      console.error(`player balance withdrawal error -> \n${err}\n----------`);
-    }
-    if (userBalance !==null) {
-      try {
+
+    //player selling transaction
+    try {
+      //reading the transaction
+      const user = await this.client.user.findFirst({
+        where: {id: bidderId},
+        select: {balance: true,points: true,id: true}
+      })
+      const player = await this.client.player.findFirst({
+        where: { id: playerId },
+        select: {points: true,ownerId: true,state: true,sellingPrice: true}
+      })
+
+      if (user && player) {
+        // changes;
+        user.balance -= amount;
+        player.sellingPrice = amount;
+        user.points += player.points;
+        player.ownerId = user.id;
+        player.state = playerState.SOLD;
+        // writing the transaction
+        //any error will stop the engine
         await this.client.user.update({
           where: { id: bidderId },
-          data: {
-            balance: userBalance.balance - amount
-          }
-        })
-        console.info(`user balanced reducted`);
-      }
-      catch (err) {
-        console.error(`user bal reduction error -> \n${err}\n----------`);
-      }
-      try {
+          data: {balance: user.balance,points: user.points}
+        });
+        console.log("user updated successfully");
         await this.client.player.update(
-          {
-            where: { id: playerId },
-            data: {
-              ownerId: bidderId,
-              state: playerState.SOLD
-            }
-          }
+          {where: { id: playerId },
+            data: {sellingPrice: player.sellingPrice,ownerId: player.ownerId,state: player.state}}
         )
-        console.info("player sold");
-      } catch (err) {
-        console.error(`player owner & state update error -> \n${err}\n----------`);
+        console.log("player updated successfully");
       }
+      else {
+        throw "did not get user and player with their ID"
+      }
+    }
+    catch (err) {
+      console.error(`error while reading -> \n${err}\n----------`);
+    }
   }
-  else {
-    console.warn("balance is still null");
-  }
-}
+
   public async storeBid(playerId:string,bidderId:string,amount:number){
     try {
       const res = await this.client.bids.create({
@@ -105,6 +99,7 @@ export default class dbManager{
         console.error(`bid store error -> \n${err}\n----------`);
     }
   }
+
   public async banUser(userId:string){
     try {
       await this.client.user.update({

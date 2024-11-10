@@ -16,8 +16,8 @@ model User {
   isBanned Boolean  @default(false)
   players  Player[]
   bids     bids[]
+  points   Int @default(0)
 }
-
 
 enum playerState {
   NOTLISTED
@@ -26,14 +26,16 @@ enum playerState {
 }
 
 model Player {
-  id        String      @id @unique
-  name      String
-  imgLink   String
-  basePrice Int
-  state     playerState @default(NOTLISTED)
-  owner     User        @relation(fields: [ownerId], references: [id])
-  ownerId   String      @default("")
-  bids      bids[]
+  id           String      @id @unique
+  name         String
+  imgLink      String
+  basePrice    Int
+  state        playerState @default(NOTLISTED)
+  owner        User        @relation(fields: [ownerId], references: [id])
+  ownerId      String      @default("")
+  bids         bids[]
+  points       Int @default(10)
+  sellingPrice Int @default(0)
 }
 
 model bids {
