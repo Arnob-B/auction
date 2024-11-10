@@ -2,15 +2,24 @@
 import './style.css'
 import React, { useState, useEffect } from 'react';
 import { AiOutlineLeft, AiOutlineRight, AiOutlinePlayCircle, AiOutlinePauseCircle } from 'react-icons/ai';
-import { MdSportsSoccer } from 'react-icons/md';
+import NoPlayersBought from './NoPlayersBought';
 
 import { playersType } from './page';
 
-export default function MyTeam({players}:{players:Array<playersType>}) {
+export default function MyTeam({userId}:{userId:string}) {
+  const [players, setPlayers] = useState<Array<playersType>>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [flipDirection, setFlipDirection] = useState<string|null>(null); // Track direction (left or right)
   const [isFlipping, setIsFlipping] = useState(false);
+  
+  useEffect(()=>{
+    fetch (`/api/user/purchases/${userId}`)
+    .then(res=>res.json())
+    .then(res=>setPlayers(res))
+    .catch(err=>console.log(err));
+  },[userId])
+
 
   // Carousel auto-play effect
   useEffect(() => {
@@ -21,6 +30,8 @@ export default function MyTeam({players}:{players:Array<playersType>}) {
       return () => clearInterval(interval);
     }
   }, [isPlaying, currentPlayerIndex]);
+  
+  if(players.length===0) return <NoPlayersBought />
 
   const handleNext = () => {
     setFlipDirection('right'); // New card enters from the right, exit is to the left
@@ -49,7 +60,7 @@ export default function MyTeam({players}:{players:Array<playersType>}) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-purple-900 text-white p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-white p-4">
       <h1 className="text-4xl font-bold mb-8 text-purple-100">My Team</h1>
 
       {/* Player Card with Flip Animation */}
@@ -59,7 +70,7 @@ export default function MyTeam({players}:{players:Array<playersType>}) {
         `}
       >
         <div className="text-center">
-          <MdSportsSoccer className="text-6xl mx-auto mb-4 text-purple-300" />
+          <img src={players[currentPlayerIndex].imgLink} alt={`${players[currentPlayerIndex].name} Photo`} className='w-auto h-auto' />
           <h2 className="text-2xl font-semibold text-purple-100">{players[currentPlayerIndex].name}</h2>
           <p className="text-lg text-purple-200">{players[currentPlayerIndex].basePrice}</p>
           <p className="text-lg text-purple-200">{players[currentPlayerIndex].sellingPrice}</p>

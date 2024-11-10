@@ -199,6 +199,7 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 				switch (msg.type) {
 					case newPlayerListedType: {
 						toast.success("New player is listed!");
+						setBidderList([]);
 						setPlayerDetails({
 							id: body.playerId,
 							name: body.playerName,

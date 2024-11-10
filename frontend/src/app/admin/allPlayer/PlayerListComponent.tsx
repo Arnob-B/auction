@@ -1,23 +1,53 @@
 "use client"
 import { adminApi } from '@/app/keys/adminKeys';
 import AdminNavbar from '@/components/AdminNavbar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast,{Toaster} from 'react-hot-toast';
+import { playerState } from '@prisma/client';
 
 const headerContent = {
   'Content-Type': 'application/json',
 }
-export const PlayerList = ({ players }: { 
-  players: Array<{ 
+export const PlayerList = () => {
+  const [searchId, setSearchId] = useState('');
+  const [searchName, setSearchName] = useState('');
+  const [filterState, setFilterState] = useState<'All' | 'Listed' | 'Not Listed' | 'Sold'>('All');
+
+  const [players, setPlayers] = useState<Array<{ 
     playerId: string; 
     playerName: string; 
     basePrice: number; 
     playerState: 'Listed' | 'Not Listed' | 'Sold'; 
-  }> 
-}) => {
-  const [searchId, setSearchId] = useState('');
-  const [searchName, setSearchName] = useState('');
-  const [filterState, setFilterState] = useState<'All' | 'Listed' | 'Not Listed' | 'Sold'>('All');
+  }>>([]);
+
+  useEffect(()=>{
+    fetch("/api/admin/getAllPlayers")
+    .then(res=>res.json())
+    .then(res=>{
+      const updatedPlayers = [];
+      for(const a of res){
+        let state: 'Listed' | 'Not Listed' | 'Sold'; 
+        switch (a.state){
+          case playerState.LISTED:
+            state = 'Listed';
+            break;
+          case playerState.NOTLISTED:
+            state = 'Not Listed';
+            break;
+          default:
+            state = 'Sold';
+            break;
+        }
+        updatedPlayers.push({
+          playerId:a.id,
+          playerName:a.name,
+          basePrice:a.basePrice,
+          playerState: state
+        });
+      }
+      setPlayers(updatedPlayers);
+    })
+  },[])
 
   const filteredPlayers = players.filter(player => {
     const matchesId = player.playerId.includes(searchId);

@@ -12,18 +12,20 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum userRole {
   USER
   ADMIN
 }
 
-
 model User {
-  id       String @id
+  id       String   @id
   name     String
   password String
   role     String
   balance  Int
+  players  Player[]
+  points   Int
 }
 
 enum playerState {
@@ -33,9 +35,13 @@ enum playerState {
 }
 
 model Player {
-  id        String      @id @unique
-  name      String
-  imgLink   String
-  basePrice Int
-  state     playerState @default(NOTLISTED)
+  id           String      @id @unique
+  name         String
+  imgLink      String
+  basePrice    Int
+  state        playerState @default(NOTLISTED)
+  owner        User        @relation(fields: [ownerId], references: [id])
+  ownerId      String      @default("")
+  points       Int
+  sellingPrice Int
 }
