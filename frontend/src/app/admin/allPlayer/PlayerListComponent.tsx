@@ -1,62 +1,72 @@
 "use client"
 import { adminApi } from '@/app/keys/adminKeys';
 import AdminNavbar from '@/components/AdminNavbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import toast,{Toaster} from 'react-hot-toast';
-import { playerState } from '@prisma/client';
+// import { playerState } from '@prisma/client';
+// import fetchPlayers from "./fetchPlayers";
+// import { useRouter } from 'next/navigation';
 
 const headerContent = {
   'Content-Type': 'application/json',
 }
-export const PlayerList = () => {
+
+export const PlayerList = ({players}:{players:{ 
+  playerId: string; 
+  playerName: string; 
+  basePrice: number; 
+  playerState: 'Listed' | 'Not Listed' | 'Sold'; 
+}[]}) => {
+  // const router = useRouter();
   const [searchId, setSearchId] = useState('');
   const [searchName, setSearchName] = useState('');
   const [filterState, setFilterState] = useState<'All' | 'Listed' | 'Not Listed' | 'Sold'>('All');
 
-  const [players, setPlayers] = useState<Array<{ 
-    playerId: string; 
-    playerName: string; 
-    basePrice: number; 
-    playerState: 'Listed' | 'Not Listed' | 'Sold'; 
-  }>>([]);
+  // const [players, setPlayers] = useState<Array<{ 
+  //   playerId: string; 
+  //   playerName: string; 
+  //   basePrice: number; 
+  //   playerState: 'Listed' | 'Not Listed' | 'Sold'; 
+  // }>>([]);
 
-  useEffect(()=>{
-    fetch("/api/admin/getAllPlayers")
-    .then(res=>res.json())
-    .then(res=>{
-      const updatedPlayers = [];
-      for(const a of res){
-        let state: 'Listed' | 'Not Listed' | 'Sold'; 
-        switch (a.state){
-          case playerState.LISTED:
-            state = 'Listed';
-            break;
-          case playerState.NOTLISTED:
-            state = 'Not Listed';
-            break;
-          default:
-            state = 'Sold';
-            break;
-        }
-        updatedPlayers.push({
-          playerId:a.id,
-          playerName:a.name,
-          basePrice:a.basePrice,
-          playerState: state
-        });
-      }
-      setPlayers(updatedPlayers);
-    })
-  },[])
-
+  // useEffect(()=>{
+  //   // fetch("/api/admin/getAllPlayers", {cache: 'no-store'})
+  //   // .then(res=>res.json())
+  //   fetchPlayers()
+  //   .then(res=>{
+  //     const updatedPlayers = [];
+  //     for(const a of res){
+  //       let state: 'Listed' | 'Not Listed' | 'Sold'; 
+  //       switch (a.state){
+  //         case playerState.LISTED:
+  //           state = 'Listed';
+  //           break;
+  //         case playerState.NOTLISTED:
+  //           state = 'Not Listed';
+  //           break;
+  //         default:
+  //           state = 'Sold';
+  //           break;
+  //       }
+  //       updatedPlayers.push({
+  //         playerId:a.id,
+  //         playerName:a.name,
+  //         basePrice:a.basePrice,
+  //         playerState: state
+  //       });
+  //     }
+  //     setPlayers(updatedPlayers);
+  //   })
+  // },[])
+  
   const filteredPlayers = players.filter(player => {
     const matchesId = player.playerId.includes(searchId);
     const matchesName = player.playerName.toLowerCase().includes(searchName.toLowerCase());
     const matchesState = filterState === 'All' || player.playerState === filterState;
-
+    
     return matchesId && matchesName && matchesState;
   });
-
+  
   const listPlayerHandler = (playerId: string, playerName: string, basePrice: number) => {
     return async () => {
       const res = await fetch(adminApi+'/addPlayer', {
@@ -71,6 +81,9 @@ export const PlayerList = () => {
       const json = await res.json();
       if(json.msg === "playerAlreadyInBid") toast.error("Player already in bid");
       else toast.success(json.msg);
+      // setTimeout(()=>{
+      //   router.refresh();
+      // },1000);
     };
   };
 
