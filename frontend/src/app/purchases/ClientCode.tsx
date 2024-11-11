@@ -72,8 +72,8 @@ export default function MyTeam({userId}:{userId:string}) {
         <div className="text-center">
           <img src={players[currentPlayerIndex].imgLink} alt={`${players[currentPlayerIndex].name} Photo`} className='w-auto h-auto' />
           <h2 className="text-2xl font-semibold text-purple-100">{players[currentPlayerIndex].name}</h2>
-          <p className="text-lg text-purple-200">{players[currentPlayerIndex].basePrice}</p>
-          <p className="text-lg text-purple-200">{players[currentPlayerIndex].sellingPrice}</p>
+          <p className="text-lg text-purple-200">Base Price: {players[currentPlayerIndex].basePrice}</p>
+          <p className="text-lg text-purple-200">Purchase Price: {players[currentPlayerIndex].sellingPrice}</p>
         </div>
       </div>
 
