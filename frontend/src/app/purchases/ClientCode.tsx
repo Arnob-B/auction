@@ -6,19 +6,19 @@ import NoPlayersBought from './NoPlayersBought';
 
 import { playersType } from './page';
 
-export default function MyTeam({userId}:{userId:string}) {
-  const [players, setPlayers] = useState<Array<playersType>>([]);
+export default function MyTeam({players}:{players:playersType[]}) {
+  // const [players, setPlayers] = useState<Array<playersType>>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [flipDirection, setFlipDirection] = useState<string|null>(null); // Track direction (left or right)
   const [isFlipping, setIsFlipping] = useState(false);
   
-  useEffect(()=>{
-    fetch (`/api/user/purchases/${userId}`)
-    .then(res=>res.json())
-    .then(res=>setPlayers(res))
-    .catch(err=>console.log(err));
-  },[userId])
+  // useEffect(()=>{
+  //   fetch (`/api/user/purchases/${userId}`)
+  //   .then(res=>res.json())
+  //   .then(res=>setPlayers(res))
+  //   .catch(err=>console.log(err));
+  // },[userId])
 
 
   // Carousel auto-play effect

@@ -17,6 +17,8 @@ import NoPlayerListed from "@/components/Bidder/NoPlayerListed";
 import LeaderBoard from "@/components/Bidder/Leaderboard";
 import AlertBox from "@/components/Bidder/AlertBox";
 import getPlayerImageLink from "./getPlayerImage";
+// import { unstable_cache } from "next/cache";
+import getCachedBalance from "./getCachedBalance";
 
 type playerDetailsType = {
 	id: string;
@@ -152,26 +154,23 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 		});
 	};
 
+	// const getCachedBalance = unstable_cache(()=>{
+	// 	const balance = fetch(`api/user/getBalance/${userId}`);
+	// 	return balance;
+	// },[],{revalidate:30});
+
 	const updateBalance = () => {
-		fetch(`api/user/getBalance/${userId}`, 
-			{next: { 
-				revalidate: 300
-			}})
-			.then(res=>res.json())
-			.then(res=>setUserBalance(res.balance));
-	}
+		getCachedBalance(userId)
+			// .then((res) => res.json())
+			.then((res) => res && setUserBalance(res.balance));
+	};
 
 	useEffect(() => {
 		const main = async () => {
 			const res = await fetch(generalApi + "/getCurrentPlayer");
 			const body = await res.json();
 			const data = body.msg;
-			fetch(`api/user/getBalance/${userId}`, 
-				{next: { 
-					revalidate: 300
-				}})
-				.then(res=>res.json())
-				.then(res=>setUserBalance(res.balance));
+			updateBalance();
 			const playerImage = await getPlayerImageLink(data.id);
 			setPlayerDetails({
 				id: data.id,
