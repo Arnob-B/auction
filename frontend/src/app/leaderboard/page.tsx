@@ -10,8 +10,11 @@ function LeaderBoard({
 		<div className="overflow-visible pt-6 w-full flex justify-center">
 			<div className="bg-gradient-to-tr from-white/5 via-white/5 to-white/10 backdrop-blur-md rounded-lg shadow-lg max-h-[77vh] w-[90%] md:w-[75%] lg:w-[50%]">
 				<div className="p-4 border-b border-gray-700">
-					<h2 className="text-xl font-semibold font-inter text-white text-center">
+					<h1 className="text-3xl font-semibold font-inter text-white text-center">
 						Leaderboard
+					</h1>
+					<h2 className="font-opensans text-primary text-center">
+						Leaderboard will be updated every 5 minutes.
 					</h2>
 				</div>
 				<ul className="divide-y divide-gray-700 flex flex-col font-opensans relative">

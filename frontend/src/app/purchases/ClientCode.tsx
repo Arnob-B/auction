@@ -61,7 +61,8 @@ export default function MyTeam({players}:{players:playersType[]}) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-white p-4">
-      <h1 className="text-4xl font-bold mb-8 text-purple-100">My Team</h1>
+      <h1 className="text-4xl font-bold text-white font-inter">My Team</h1>
+      <h2 className='text-lg font-opensans font-medium text-primary my-2'>Players will be updated every 10 minutes.</h2>
 
       {/* Player Card with Flip Animation */}
       <div
