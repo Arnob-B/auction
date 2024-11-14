@@ -166,7 +166,8 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 	};
 
 	useEffect(() => {
-		const main = async () => {
+			const wsClient = new WebSocket(generalWsApi);
+		const main = async (wsClient:WebSocket) => {
 			const res = await fetch(generalApi + "/getCurrentPlayer");
 			const body = await res.json();
 			const data = body.msg;
@@ -181,7 +182,6 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 			});
 			setNextBid(data.nextBid);
 
-			const wsClient = new WebSocket(generalWsApi);
 			wsClient.onopen = () =>{
 				setIsLive(()=> true);
 				setInterval(() => {
@@ -264,7 +264,10 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 				}
 			};
 		};
-		main();
+		main(wsClient);
+		return(()=>{
+			if(wsClient.readyState) {console.log("here");wsClient.close()};
+		})
 	}, []);
 	// console.log(">_<");
 	// console.log(playerDetails);

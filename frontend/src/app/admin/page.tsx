@@ -256,7 +256,8 @@ export default function Page() {
   });
   const [isLive , setIsLive] = useState<boolean>(false);
   useEffect(()=>{
-    const main = async()=>{
+    const wsClient = new WebSocket(adminWsApi);
+    const main = async(wsClient)=>{
       const res = await fetch(generalApi+"/getCurrentPlayer");
       const body = await res.json();
       const data = body.msg;
@@ -268,7 +269,6 @@ export default function Page() {
         nextPrice: data.nextBid
       });
 
-      const wsClient = new WebSocket(adminWsApi);
       wsClient.onopen = ()=>{
           
         setInterval(()=>{
@@ -327,7 +327,10 @@ export default function Page() {
         }
       }
     }
-    main();
+    main(wsClient);
+    return (()=>{
+      if(wsClient.readyState)wsClient.close();
+    })
   },[]);
   return (
     <>
