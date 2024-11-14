@@ -166,8 +166,7 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 	};
 
 	useEffect(() => {
-			const wsClient = new WebSocket(generalWsApi);
-		const main = async (wsClient:WebSocket) => {
+		const main = async () => {
 			const res = await fetch(generalApi + "/getCurrentPlayer");
 			const body = await res.json();
 			const data = body.msg;
@@ -182,91 +181,97 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 			});
 			setNextBid(data.nextBid);
 
-			wsClient.onopen = () =>{
-				setIsLive(()=> true);
-				setInterval(() => {
-					wsClient.send("ping");
-				}, 50000);
-			}
-			wsClient.onclose = () =>{
-				setIsLive(()=> false);
-			}
-			wsClient.onmessage = async (message) => {
-				const msg = JSON.parse(message.data);
-				const body = msg.body;
-				const playerImage = await getPlayerImageLink(body.playerId);
-				switch (msg.type) {
-					case newPlayerListedType: {
-						toast.success("New player is listed!");
-						setBidderList([]);
-						setPlayerDetails({
-							id: body.playerId,
-							name: body.playerName,
-							basePrice: body.basePrice,
-							currentPrice: body.currentPrice,
-							imgLink: playerImage.imgLink
-						});
-						setNextBid(body.currentPrice);
-						break;
-					}
-					case bidPlacedType: {
-						setPlayerDetails((prev) => {
-							if (prev.id === body.playerId) {
-								setNextBid(body.nextPrice);
-								return {
-									...prev,
-									currentPrice: body.amount,
-								};
-							} else {
-								//get the latest user
-								alert("Reload this page! Player is not up to date");
-								return prev;
-							}
-						});
-						setBidderList((prev) => {
-							return [...prev, [body.bidderName, body.amount]];
-						});
-						break;
-					}
-					case newBidPriceType: {
-						toast("New price is set");
-						setPlayerDetails((prev) => {
-							if (prev.id === body.playerId) setNextBid(body.nextPrice);
-							else {
-								alert("Reload this page! Player is not up to date");
-							}
-							return prev;
-						});
-						break;
-					}
-					case userBannedType: {
-						toast(`${body.userName} is banned`);
-						break;
-					}
-					case playerSoldType: {
-						console.log("Body: ",{body});
+		}
+		main();
 
-						setIsOpen(() => {
-							return {
-								state: true,
-								playerName: body.playerName,
-								bidderName: body.bidderName,
-								amount: body.amount,
-							};
-						});
-						break;
-					}
-					case getControlType: {
-						if (body.state === "START") toast.success("Bidding Resumed");
-						if (body.state === "STOP") toast.error("Bidding Paused");
-						break;
-					}
+		const wsClient = new WebSocket(generalWsApi);
+		wsClient.onopen = () => {
+			setIsLive(() => {
+				return true;
+			})
+			setInterval(() => {
+				wsClient.send("ping");
+			}, 50000);
+		}
+		wsClient.onclose = () => {
+			setIsLive(() => {
+				return false;
+			})
+		}
+		wsClient.onmessage = async (message) => {
+			const msg = JSON.parse(message.data);
+			const body = msg.body;
+			const playerImage = await getPlayerImageLink(body.playerId);
+			switch (msg.type) {
+				case newPlayerListedType: {
+					toast.success("New player is listed!");
+					setBidderList([]);
+					setPlayerDetails({
+						id: body.playerId,
+						name: body.playerName,
+						basePrice: body.basePrice,
+						currentPrice: body.currentPrice,
+						imgLink: playerImage.imgLink
+					});
+					setNextBid(body.currentPrice);
+					break;
 				}
-			};
+				case bidPlacedType: {
+					setPlayerDetails((prev) => {
+						if (prev.id === body.playerId) {
+							setNextBid(body.nextPrice);
+							return {
+								...prev,
+								currentPrice: body.amount,
+							};
+						} else {
+							//get the latest user
+							alert("Reload this page! Player is not up to date");
+							return prev;
+						}
+					});
+					setBidderList((prev) => {
+						return [...prev, [body.bidderName, body.amount]];
+					});
+					break;
+				}
+				case newBidPriceType: {
+					toast("New price is set");
+					setPlayerDetails((prev) => {
+						if (prev.id === body.playerId) setNextBid(body.nextPrice);
+						else {
+							alert("Reload this page! Player is not up to date");
+						}
+						return prev;
+					});
+					break;
+				}
+				case userBannedType: {
+					toast(`${body.userName} is banned`);
+					break;
+				}
+				case playerSoldType: {
+					console.log("Body: ", { body });
+
+					setIsOpen(() => {
+						return {
+							state: true,
+							playerName: body.playerName,
+							bidderName: body.bidderName,
+							amount: body.amount,
+						};
+					});
+					break;
+				}
+				case getControlType: {
+					if (body.state === "START") toast.success("Bidding Resumed");
+					if (body.state === "STOP") toast.error("Bidding Paused");
+					break;
+				}
+			}
 		};
-		main(wsClient);
-		return(()=>{
-			if(wsClient.readyState) {console.log("here");wsClient.close()};
+		return (() => {
+			if (wsClient.readyState) { console.log("here"); wsClient.close() };
 		})
 	}, []);
 	// console.log(">_<");
@@ -274,6 +279,9 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 	if (playerDetails.id === "") return <NoPlayerListed isLive={isLive} userId={userId} />;
 	return (
 		<div className="max-w-screen h-screen flex flex-col items-center relative py-8 sm:py-0">
+			<div onClick={()=>{
+				console.log(isLive);
+			}}>clickme</div>
 			<UserNavbar />
 			<Toaster
 				position="bottom-left"

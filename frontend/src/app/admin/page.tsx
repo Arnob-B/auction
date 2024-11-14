@@ -256,9 +256,8 @@ export default function Page() {
   });
   const [isLive , setIsLive] = useState<boolean>(false);
   useEffect(()=>{
-    const wsClient = new WebSocket(adminWsApi);
-    const main = async(wsClient:WebSocket)=>{
-      const res = await fetch(generalApi+"/getCurrentPlayer");
+    const main = async () => {
+      const res = await fetch(generalApi + "/getCurrentPlayer");
       const body = await res.json();
       const data = body.msg;
       setPlayerDetails({
@@ -268,68 +267,68 @@ export default function Page() {
         currentPrice: data.currentPrice,
         nextPrice: data.nextBid
       });
+    }
+    const wsClient = new WebSocket(adminWsApi);
+    wsClient.onopen = () => {
 
-      wsClient.onopen = ()=>{
-          
-        setInterval(()=>{
-          wsClient.send("ping");
-        },50000)
-        setIsLive(() => {
-          return true;
+      setInterval(() => {
+        wsClient.send("ping");
+      }, 50000)
+      setIsLive(() => {
+        return true;
+      })
+    }
+    wsClient.onclose = () => {
+      setIsLive(() => {
+        return false;
+      })
+    }
+    wsClient.onmessage = (message) => {
+      const msg = JSON.parse(message.data);
+      if (msg.type === newPlayerListedType) {
+        const body = msg.body;
+        setPlayerDetails({
+          playerId: body.playerId,
+          playerName: body.playerName,
+          basePrice: body.basePrice,
+          currentPrice: body.currentPrice,
+          nextPrice: body.currentPrice
         })
       }
-      wsClient.onclose = () => {
-        setIsLive(() => {
-          return false;
-        })
+      if (msg.type === bidPlacedType) {
+        const body = msg.body;
+        setPlayerDetails((prev) => {
+          if (prev.playerId === body.playerId)
+            return {
+              ...prev,
+              currentPrice: body.amount,
+              nextPrice: body.nextPrice,
+            }
+          else {
+            //get the latest user
+            alert("reload this page as player is not up to date");
+            return prev;
+          }
+        });
       }
-      wsClient.onmessage = (message) => {
-        const msg = JSON.parse(message.data);
-        if (msg.type === newPlayerListedType) {
-          const body = msg.body;
-          setPlayerDetails({
-            playerId: body.playerId,
-            playerName: body.playerName,
-            basePrice: body.basePrice,
-            currentPrice: body.currentPrice,
-            nextPrice: body.currentPrice
-          })
-        }
-        if (msg.type === bidPlacedType) {
-          const body = msg.body;
-          setPlayerDetails((prev) => {
-            if (prev.playerId === body.playerId)
-              return {
-                ...prev,
-                currentPrice: body.amount,
-                nextPrice: body.nextPrice,
-              }
-            else {
-              //get the latest user
-              alert("reload this page as player is not up to date");
-              return prev;
+      if (msg.type === newBidPriceType) {
+        const body = msg.body;
+        setPlayerDetails(prev => {
+          if (prev.playerId === body.playerId)
+            return {
+              ...prev,
+              nextPrice: body.nextPrice
             }
-          });
-        }
-        if (msg.type === newBidPriceType) {
-          const body = msg.body;
-          setPlayerDetails(prev => {
-            if (prev.playerId === body.playerId)
-              return {
-                ...prev,
-                nextPrice: body.nextPrice
-              }
-            else {
-              alert("reload this page as player is not up to date");
-              return prev;
-            }
-          });
-        }
+          else {
+            alert("reload this page as player is not up to date");
+            return prev;
+          }
+        });
       }
     }
-    main(wsClient);
-    return (()=>{
-      if(wsClient.readyState)wsClient.close();
+    main();
+    return (() => {
+      if (wsClient.readyState) wsClient.close();
     })
   },[]);
   return (
