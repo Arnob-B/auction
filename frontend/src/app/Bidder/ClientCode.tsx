@@ -268,7 +268,7 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 	}, []);
 	// console.log(">_<");
 	// console.log(playerDetails);
-	if (playerDetails.id === "") return <NoPlayerListed isLive={isLive} />;
+	if (playerDetails.id === "") return <NoPlayerListed isLive={isLive} userId={userId} />;
 	return (
 		<div className="max-w-screen h-screen flex flex-col items-center relative py-8 sm:py-0">
 			<UserNavbar />
@@ -317,7 +317,7 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 					Welcome, {userName} 
 					</p>
 					<p className="sm:text-xl">
-					Balance: {userBalance}{" "}
+					Balance: Rs. {userBalance} Lakhs
 					</p>
 					</div>
 					<button onClick={updateBalance} className="bg-primary px-4 py-1 text-sm rounded-sm w-fit self-center">Refresh Balance</button>

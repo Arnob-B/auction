@@ -1,5 +1,6 @@
 import { prisma } from "@/utils/db";
 import { unstable_cache } from "next/cache";
+import UserNavbar from "@/components/UserNavbar";
 
 function LeaderBoard({
 	bidderList,
@@ -7,8 +8,9 @@ function LeaderBoard({
 	bidderList: { name: string; points: number }[];
 }) {
 	return (
-		<div className="overflow-visible pt-6 w-full flex justify-center">
-			<div className="bg-gradient-to-tr from-white/5 via-white/5 to-white/10 backdrop-blur-md rounded-lg shadow-lg max-h-[77vh] w-[90%] md:w-[75%] lg:w-[50%]">
+		<div className="overflow-visible pt-6 w-full flex justify-center relative">
+			<UserNavbar />
+			<div className="bg-gradient-to-tr from-white/5 via-white/5 to-white/10 backdrop-blur-md rounded-lg shadow-lg max-h-[67vh] mt-32 sm:mt-20 w-[90%] md:w-[75%] lg:w-[50%]">
 				<div className="p-4 border-b border-gray-700">
 					<h1 className="text-3xl font-semibold font-inter text-white text-center">
 						Leaderboard
@@ -51,7 +53,7 @@ const getCachedLeaderboard = unstable_cache(
       },
     });;
     return users;
-  },[],{revalidate: 30}
+  },[],{revalidate: 300}
 );
 
 export default async function Page() {
