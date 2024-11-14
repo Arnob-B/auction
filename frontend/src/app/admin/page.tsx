@@ -257,7 +257,7 @@ export default function Page() {
   const [isLive , setIsLive] = useState<boolean>(false);
   useEffect(()=>{
     const wsClient = new WebSocket(adminWsApi);
-    const main = async(wsClient)=>{
+    const main = async(wsClient:WebSocket)=>{
       const res = await fetch(generalApi+"/getCurrentPlayer");
       const body = await res.json();
       const data = body.msg;
