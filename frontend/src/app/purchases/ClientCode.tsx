@@ -6,19 +6,19 @@ import NoPlayersBought from './NoPlayersBought';
 
 import { playersType } from './page';
 
-export default function MyTeam({userId}:{userId:string}) {
-  const [players, setPlayers] = useState<Array<playersType>>([]);
+export default function MyTeam({players}:{players:playersType[]}) {
+  // const [players, setPlayers] = useState<Array<playersType>>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [flipDirection, setFlipDirection] = useState<string|null>(null); // Track direction (left or right)
   const [isFlipping, setIsFlipping] = useState(false);
   
-  useEffect(()=>{
-    fetch (`/api/user/purchases/${userId}`)
-    .then(res=>res.json())
-    .then(res=>setPlayers(res))
-    .catch(err=>console.log(err));
-  },[userId])
+  // useEffect(()=>{
+  //   fetch (`/api/user/purchases/${userId}`)
+  //   .then(res=>res.json())
+  //   .then(res=>setPlayers(res))
+  //   .catch(err=>console.log(err));
+  // },[userId])
 
 
   // Carousel auto-play effect
@@ -61,7 +61,8 @@ export default function MyTeam({userId}:{userId:string}) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-white p-4">
-      <h1 className="text-4xl font-bold mb-8 text-purple-100">My Team</h1>
+      <h1 className="text-4xl font-bold text-white font-inter">My Team</h1>
+      <h2 className='text-lg font-opensans font-medium text-primary my-2'>Players will be updated every 10 minutes.</h2>
 
       {/* Player Card with Flip Animation */}
       <div
