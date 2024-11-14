@@ -27,7 +27,7 @@ const getCachedPurchases = unstable_cache(async (userId:string)=>{
       sellingPrice: true
   }})
   return purchases;
-},[],{revalidate:30});
+},[],{revalidate:600});
 
 export default async function  Page(){
 	const session = await auth();

@@ -144,7 +144,7 @@ const PriceControl = () => {
   return (
       <div className="w-[93%] bg-gradient-to-tr from-white/10 to-white/15 backdrop-blur-md rounded-lg shadow-lg overflow-hidden mt-6 p-4">
           <h2 className="text-xl font-semibold text-white text-center font-inter">Change Bid Price</h2>
-          <div className="flex gap-x-6 items-center justify-around">
+          <div className="flex flex-col md:flex-row gap-x-6 items-center justify-around">
             <input
               type="number"
               id="incrementPrice"

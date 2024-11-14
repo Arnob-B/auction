@@ -11,7 +11,7 @@ export default function LeaderBoard({ bidderList }: { bidderList: [string, numbe
 					return (
 						<li key={ind} className="flex justify-between items-center p-4">
 							<span className="text-white">{e[0]}</span>
-							<span className="text-green-400 font-bold">{e[1]}</span>
+							<span className="text-green-400 font-bold">{e[1]} Lakhs</span>
 						</li>
 					);
 				})}
