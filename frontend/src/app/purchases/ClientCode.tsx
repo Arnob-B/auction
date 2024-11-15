@@ -3,6 +3,7 @@ import './style.css'
 import React, { useState, useEffect } from 'react';
 import { AiOutlineLeft, AiOutlineRight, AiOutlinePlayCircle, AiOutlinePauseCircle } from 'react-icons/ai';
 import NoPlayersBought from './NoPlayersBought';
+import Link from "next/link";
 
 import { playersType } from './page';
 
@@ -61,7 +62,10 @@ export default function MyTeam({players}:{players:playersType[]}) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-white p-4">
+      <div className='flex items-end gap-x-4'>
       <h1 className="text-4xl font-bold text-white font-inter">My Team</h1>
+      <Link href="/Bidder" className='text-xl sm:ml-8 underline underline-offset-1 text-accent'>Bidding Page</Link>
+      </div>
       <h2 className='text-lg font-opensans font-medium text-primary my-2'>Players will be updated every 10 minutes.</h2>
 
       {/* Player Card with Flip Animation */}

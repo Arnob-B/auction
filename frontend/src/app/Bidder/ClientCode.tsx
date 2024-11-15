@@ -279,9 +279,6 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 	if (playerDetails.id === "") return <NoPlayerListed isLive={isLive} userId={userId} />;
 	return (
 		<div className="max-w-screen h-screen flex flex-col items-center relative py-8 sm:py-0">
-			<div onClick={()=>{
-				console.log(isLive);
-			}}>clickme</div>
 			<UserNavbar />
 			<Toaster
 				position="bottom-left"

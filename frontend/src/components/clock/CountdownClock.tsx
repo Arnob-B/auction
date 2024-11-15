@@ -44,12 +44,20 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate }) => {
   }
 
   return (
-    <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-      <TimeUnit label="days" value={timeLeft.days} />
-      <TimeUnit label="hours" value={timeLeft.hours} />
-      <TimeUnit label="min" value={timeLeft.minutes} />
-      <TimeUnit label="sec" value={timeLeft.seconds} />
+    <>
+    <div className="hidden sm:grid grid-flow-col grid-cols-3 gap-5 text-center auto-cols-max">
+      {/* <TimeUnit label="days" value={timeLeft.days} /> */}
+      <TimeUnit label="Hours" value={timeLeft.hours} />
+      <TimeUnit label="Minutes" value={timeLeft.minutes} />
+      <TimeUnit label="Seconds" value={timeLeft.seconds} />
     </div>
+    <div className="pl-16 grid sm:hidden grid-flow-col grid-cols-3 gap-5 text-right auto-cols-max">
+      {/* <TimeUnit label="days" value={timeLeft.days} /> */}
+      <TimeUnit label="H" value={timeLeft.hours} />
+      <TimeUnit label="M" value={timeLeft.minutes} />
+      <TimeUnit label="S" value={timeLeft.seconds} />
+    </div>
+    </>
   );
 };
 
@@ -60,9 +68,9 @@ interface TimeUnitProps {
 
 const TimeUnit: React.FC<TimeUnitProps> = ({ label, value }) => {
   return (
-    <div className="flex flex-col p-4 bg-white/20 rounded-xl shadow-lg backdrop-blur-lg text-white">
-      <span className="font-mono text-5xl">{value}</span>
-      <span className="text-sm mt-2 opacity-70">{label}</span>
+    <div className="flex flex-col p-2 px-4 sm:p-4 bg-white/20 rounded-xl shadow-lg backdrop-blur-lg text-white w-full">
+      <span className="font-mono sm:text-3xl">{value}</span>
+      <span className="text-sm sm:mt-2 opacity-70">{label}</span>
     </div>
   );
 };
