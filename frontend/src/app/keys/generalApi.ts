@@ -1,2 +1,2 @@
-export const generalApi = "https://backend2.juecell.com/api"
-export const generalWsApi = "https://backend2.juecell.com/generalWs"
+export const generalApi = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3005"
+export const generalWsApi = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://localhost:3002"
