@@ -25,15 +25,15 @@ function NoPlayerListed({isLive, userId}:{isLive:boolean, userId:string}){
         <div className='text-center flex flex-col items-center gap-y-4 font-inter sm:mt-8 h-full pt-4 sm:pt-0 sm:h-auto'>
         <CountdownTimer targetDate={targetTime}/>
             <div className='hidden sm:flex flex-col items-center justify-center sm:flex-row sm:gap-12 h-1/2'>
-                <Image src="/esummit-logo.png" alt='E-Summit Logo' width={240} height={110} className='h-auto my-4'/>
-                <Image src="/mock-ipl-logo.png" alt='Mock IPL Logo' width={240} height={150}/>
+                <Image src="/e-summit.png" alt='E-Summit Logo' width={240} height={110} className='h-auto my-4'/>
+                <Image src="/summit-cup.png" alt='Summit Cup Logo' width={240} height={150}/>
             </div>
             <div className='flex sm:hidden flex-col items-center justify-center sm:flex-row sm:gap-12 mt-6'>
-                <Image src="/esummit-logo.png" alt='E-Summit Logo' width={240} height={110} className='h-auto my-4'/>
-                <Image src="/mock-ipl-logo.png" alt='Mock IPL Logo' width={240} height={150}/>
+                <Image src="/e-summit.png" alt='E-Summit Logo' width={240} height={110} className='h-auto my-4'/>
+                <Image src="/summit-cup.png" alt='Summit Cup Logo' width={240} height={150}/>
             </div>
             <div className="flex flex-col sm:flex-row gap-x-4 gap-y-2">
-            <h1 className="font-opensans text-primary">Your Balance: Rs. {userBalance} Lakhs</h1>
+            <h1 className="font-opensans text-primary">Your Balance: €{userBalance} Million</h1>
             <button onClick={updateBalance} className="bg-primary px-4 py-1 text-sm rounded-sm w-fit self-center">Refresh Balance</button>
             </div>
             
