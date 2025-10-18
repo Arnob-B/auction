@@ -22,7 +22,7 @@ const AlertBox = ({
 					Bidder Name: <span className="text-white">{bidderName}</span>
 				</p>
 				<p className="text-gray-300">
-					Selling Amount: <span className="text-white">&#8377;{sellingAmount} Lakhs</span>
+					Selling Amount: <span className="text-white">€{sellingAmount} Million</span>
 				</p>
 				<button
 					className="mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-500 transition"
