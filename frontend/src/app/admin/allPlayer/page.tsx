@@ -1,6 +1,5 @@
 import fetchPlayers from "./fetchPlayers";
 import { PlayerList } from "./PlayerListComponent";
-import { playerState } from "@prisma/client";
 
 export default async function  Page(){
   const res = await fetchPlayers();
@@ -8,10 +7,10 @@ export default async function  Page(){
   for(const a of res){
     let state: 'Listed' | 'Not Listed' | 'Sold'; 
     switch (a.state){
-      case playerState.LISTED:
+      case "LISTED":
         state = 'Listed';
         break;
-      case playerState.NOTLISTED:
+      case "NOTLISTED":
         state = 'Not Listed';
         break;
       default:
