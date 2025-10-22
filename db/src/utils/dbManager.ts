@@ -1,4 +1,4 @@
-import { PrismaClient ,playerState} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export default class dbManager{
   private client :PrismaClient;
@@ -18,7 +18,7 @@ export default class dbManager{
         {
           where: { id: playerId },
           data: {
-            state: playerState.LISTED
+            state: "LISTED"
           }
         }
       )
@@ -36,7 +36,7 @@ export default class dbManager{
         console.log(`empty sell initiated`);
         const res = await this.client.player.update({
             where: { id: playerId },
-            data: {state: playerState.SOLD}
+            data: {state: "SOLD"}
           })
         console.log(`marked as sold`);
       }
@@ -62,7 +62,7 @@ export default class dbManager{
         player.sellingPrice = amount;
         user.points += player.points;
         player.ownerId = user.id;
-        player.state = playerState.SOLD;
+        player.state = "SOLD";
         // writing the transaction
         //any error will stop the engine
         await this.client.user.update({

@@ -13,9 +13,9 @@ async function Login() {
   // console.log(session);
 	return <main className="flex flex-col justify-center items-center h-full">
     <div className="bg-gradient-to-tr from-[#00000040] via-[#00000020] to-secondary backdrop-blur-lg border border-[#ffffff40] rounded-xl shadow-lg p-6 mx-2 max-w-sm flex flex-col items-center gap-y-4">
-      <Image src="/esummit-logo.png" alt="E-Summit'24" width={300} height={100} className="w-3/4"/>
+      <Image src="/e-summit.png" alt="E-Summit'25" width={300} height={100} className="w-1/3"/>
       <h1 className="text-xl font-opensans font-medium text-accent">Presents</h1>
-      <Image src="/mock-ipl-logo.png" alt="E-Summit'24" width={300} height={100} className="w-3/5 aspect-video"/>
+      <Image src="/summit-cup.png" alt="Summit Cup" width={300} height={100} className="w-4/5 aspect-video"/>
       <LoginForm />
     </div>
   </main>;

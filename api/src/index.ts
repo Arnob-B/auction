@@ -3,6 +3,7 @@ import adminRoute from './routes/adminRoute'
 import express from "express"
 const cors = require('cors')
 import { addPlayer, getCurrentPlayer, messagesFromApiType, placeBid } from "./types/streamType";
+require('dotenv').config();
 redisManager.getInstance();
 const app = express();
 app.use(express.json());
@@ -47,6 +48,7 @@ app.post('/bid',async(req,res)=>{
     res.json({ msg: "failed" });
   }
 });
-app.listen(3000, ()=>{
-  console.log("application started at 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, ()=>{
+  console.log(`application started at ${PORT}`);
 });

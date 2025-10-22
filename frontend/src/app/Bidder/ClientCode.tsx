@@ -58,7 +58,7 @@ function PlaceBid({
 	return (
     <div className="flex flex-col gap-2 my-6 items-center">
       <h2 className="w-1/2 font-opensans text-center">
-      &#8377;{bidAmnt} Lakhs
+      €{bidAmnt} Million
       </h2>
 				<button
 					type="submit"
@@ -80,11 +80,11 @@ function SmallCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsTy
         <div className="w-full flex justify-between">
         <div className="flex flex-col">
         <h3 className="text-xl font-inter text-purple-300">Base Price</h3>
-        <h3 className="text-lg font-opensans">&#8377;{playerDetails.basePrice} Lakhs</h3>
+        <h3 className="text-lg font-opensans">€{playerDetails.basePrice} Million</h3>
         </div>
         <div className="flex flex-col">
         <h3 className="text-xl font-inter text-purple-300">Current Price</h3>
-        <h3 className="text-lg font-inter">&#8377;{playerDetails.currentPrice} Lakhs</h3>
+        <h3 className="text-lg font-inter">€{playerDetails.currentPrice} Million</h3>
         </div>
         </div>
       </div>
@@ -111,11 +111,11 @@ function LargeCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsTy
         <div className="w-full flex justify-between">
         <div className="flex flex-col">
         <h3 className="text-xl font-inter text-primary">Base Price</h3>
-        <h3 className="text-lg font-opensans text-center">&#8377;{playerDetails.basePrice} Lakhs</h3>
+        <h3 className="text-lg font-opensans text-center">€{playerDetails.basePrice} Million</h3>
         </div>
         <div className="flex flex-col">
         <h3 className="text-xl font-inter text-primary">Current Price</h3>
-        <h3 className="text-lg font-inter text-center">&#8377;{playerDetails.currentPrice} Lakhs</h3>
+        <h3 className="text-lg font-inter text-center">€{playerDetails.currentPrice} Million</h3>
         </div>
         </div>
       <PlaceBid bidAmnt={nextBid} playerId={playerDetails.id} userId={userId}></PlaceBid>
@@ -325,7 +325,7 @@ export default function ClientCode({userId, userName}:{userId:string, userName:s
 					Welcome, {userName} 
 					</p>
 					<p className="sm:text-xl">
-					Balance: Rs. {userBalance} Lakhs
+					Balance: €{userBalance} Million
 					</p>
 					</div>
 					<button onClick={updateBalance} className="bg-primary px-4 py-1 text-sm rounded-sm w-fit self-center">Refresh Balance</button>

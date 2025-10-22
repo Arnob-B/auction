@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -19,18 +19,12 @@ model User {
   points   Int @default(0)
 }
 
-enum playerState {
-  NOTLISTED
-  LISTED
-  SOLD
-}
-
 model Player {
   id           String      @id @unique
   name         String
   imgLink      String
   basePrice    Int
-  state        playerState @default(NOTLISTED)
+  state        String      @default("NOTLISTED")
   owner        User        @relation(fields: [ownerId], references: [id])
   ownerId      String      @default("")
   bids         bids[]
