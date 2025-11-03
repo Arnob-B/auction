@@ -19,6 +19,7 @@ import AlertBox from "@/components/Bidder/AlertBox";
 import getPlayerImageLink from "./getPlayerImage";
 // import { unstable_cache } from "next/cache";
 import getCachedBalance from "./getCachedBalance";
+import Image from "next/image";
 
 type playerDetailsType = {
 	id: string;
@@ -73,7 +74,7 @@ function PlaceBid({
 function SmallCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsType,nextBid:number,userId:string}) {
   return (
     <div className="flex flex-col md:flex-row gap-8 px-8 md:hidden">
-      <div className="h-[75vh] flex flex-col justify-end" style={{backgroundImage: `linear-gradient(#3c096c20,#3c096c95,#3c096c), url('${playerDetails.imgLink}')`, backgroundRepeat: "no-repeat", backgroundSize: "cover", backgroundPosition: "center"}}>
+      <div className="h-[75vh] flex flex-col justify-end" style={{backgroundImage: `linear-gradient(#3c096c20,#3c096c95,#3c096c), url('/api/proxy-image?url=${playerDetails.imgLink}')`, backgroundRepeat: "no-repeat", backgroundSize: "cover", backgroundPosition: "center"}}>
       <div className="w-full flex flex-col gap-y-6 justify-center px-3">
         <h1 className="text-3xl font-inter font-medium">{playerDetails.name}</h1>
         {/* <h2 className="text-lg font-inter my-4">Player Id: {playerDetails.id}</h2> */}
@@ -98,9 +99,10 @@ function LargeCard({playerDetails,nextBid,userId}:{playerDetails:playerDetailsTy
   return (
     <div className="md:flex flex-col md:flex-row gap-8 px-8 hidden">
       <div className="h-[75vh]">
-      <img
-				className="h-full w-auto object-cover"
-				src={playerDetails.imgLink}
+      <Image
+	  width={500} height={500}
+				className="h-full w-auto object-contain"
+				src={`/api/proxy-image?url=${playerDetails.imgLink}`}
 				alt={`${playerDetails.name} Image`}
 			/>
 			{/* <Image src={playerDetails.imgLink} alt={`${playerDetails.name} Image`} width={400} height={400} className="h-full w-auto object-cover"/> */}
