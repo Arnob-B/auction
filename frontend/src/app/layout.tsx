@@ -25,8 +25,8 @@ const open_sans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Mock IPL Auction",
-  description: "Mock IPL Auction",
+  title: "Summit Cup Auction",
+  description: "Summit Cup Auction",
 };
 
 export default function RootLayout({

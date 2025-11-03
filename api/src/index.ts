@@ -47,6 +47,8 @@ app.post('/bid',async(req,res)=>{
     res.json({ msg: "failed" });
   }
 });
-app.listen(3000, ()=>{
-  console.log("application started at 3000");
+
+const PORT = process.env.PORT || 3300 
+app.listen(PORT, ()=>{
+  console.log(`application started at ${PORT}`);
 });
